@@ -1,4 +1,9 @@
 
+#from Objects.varObject import variableObject
+
+from Objects.varObject import variableObject
+
+
 class Parser(object):
 	"""docstring for Parser"""
 	def __init__(self, tokens ):
@@ -7,6 +12,8 @@ class Parser(object):
 		self.tokens = tokens
 		# this will hold the token index were at
 		self.token_index = 0
+		self.transpiled_code = ""
+
 
 	def parse(self):
 
@@ -28,8 +35,19 @@ class Parser(object):
 			# increment so we can loop through all the elements
 			self.token_index += 1
 
+		print(self.transpiled_code)
+
+
+
 	def parse_variable_decleration(self, token_stream):
 		tokens_checked = 0
+
+		# need this to create var object
+		name = ""
+		operator = ""
+		value = ""
+
+
 
 		for token in range(0, len(token_stream)):
 
@@ -40,22 +58,16 @@ class Parser(object):
 			if token_type == "STATEMENT_END":
 				break
 
-
-			# this will get the variable (var, let, const...)
-			if token == 0:
-				print("Variable type: " + token_value)
-
-			#this will get the variable name and error validation 
+			# this will get the variable name and error validation 
 			elif token == 1 and token_type == "IDENTIFIER":
-				print("Variable name: " + token_value)
-
+				name = token_value
 			elif token == 1 and token_type != "IDENTIFIER":
 				print("Error: Invalid variable name " + token_value)
 				quit()
 
 			# this will get variable Assignment opererator and does error validation
 			elif token == 2 and token_type == "OPERATOR":
-				print("Asignment opererator: " + token_value)
+				opererator = token_value
 			elif token == 2 and token_type != "OPERATOR":
 				print("Error: Assignment opererator is invalid")
 				quit()
@@ -63,13 +75,16 @@ class Parser(object):
 
 			# this will get the variable value assigned
 			elif token == 3 and token_type in ["STRING","INTEGER", "IDENTIFIER"]:
-				print("Variable value: " + token_value)
+				value = token_value
 			elif token == 3 and token_type not in ["STRING","INTEGER", "IDENTIFIER"]:
 				print("Invalid variable assignment value " + token_value)
 				quit()
 
 
 			tokens_checked += 1
+
+		varObj = variableObject()
+		self.transpiled_code += varObj.transpile(name, opererator, value)
 
 		# increment token index by amount of tokens we checked so no need to check again
 		self.token_index += tokens_checked
