@@ -71,6 +71,19 @@ class Parser(object):
 
 			tokens_checked += 1
 
+		# increment token index by amount of tokens we checked so no need to check again
+		self.token_index += tokens_checked
+
+
+
+
+
+
+
+
+
+
+
 
 
 		
