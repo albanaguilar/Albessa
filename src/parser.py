@@ -32,8 +32,14 @@ class Parser(object):
 		tokens_checked = 0
 
 		for token in range(0, len(token_stream)):
+
 			token_type = token_stream[tokens_checked][0]
 			token_value = token_stream[tokens_checked][1]
+
+			# if statement_end or ; is found it breaks the for loop
+			if token_type == "STATEMENT_END":
+				break
+
 
 			# this will get the variable (var, let, const...)
 			if token == 0:
@@ -43,16 +49,27 @@ class Parser(object):
 			elif token == 1 and token_type == "IDENTIFIER":
 				print("Variable name: " + token_value)
 
-
 			elif token == 1 and token_type != "IDENTIFIER":
 				print("Error: Invalid variable name " + token_value)
 				quit()
 
-			elif token == 2 and token_type == "OPERATOR"
+			# this will get variable Assignment opererator and does error validation
+			elif token == 2 and token_type == "OPERATOR":
+				print("Asignment opererator: " + token_value)
+			elif token == 2 and token_type != "OPERATOR":
+				print("Error: Assignment opererator is invalid")
+				quit()
 
 
+			# this will get the variable value assigned
+			elif token == 3 and token_type in ["STRING","INTEGER", "IDENTIFIER"]:
+				print("Variable value: " + token_value)
+			elif token == 3 and token_type not in ["STRING","INTEGER", "IDENTIFIER"]:
+				print("Invalid variable assignment value " + token_value)
+				quit()
 
 
+			tokens_checked += 1
 
 
 
