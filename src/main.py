@@ -1,5 +1,8 @@
 import lexer
 import parser
+import ply.lexx as lexx
+import ply.yacc as yacc
+import sys
 
 def main():
 

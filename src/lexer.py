@@ -1,4 +1,7 @@
 import re #this imports regular expresions library
+import ply.lexx as lexx
+import ply.yacc as yacc
+import sys
 
 
 class Lexer(object):
