@@ -1,0 +1,23 @@
+program foreverAlone;
+
+var int i, j, d, h;
+float po;
+char doo, y, mj;
+
+funcion int factores (int i, float po)
+var int j;
+{
+	i = 14;
+	return j;
+}
+
+funcion void factores ()
+var float po;
+{
+	
+}
+
+main (){
+	
+}
+end

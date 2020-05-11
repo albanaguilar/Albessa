@@ -1,5 +1,5 @@
-import lex.lex as lex
-import yacc.yacc as yacc
+import ply.lex as lex
+import ply.yacc as yacc
 
 
 #reserved words from the language
@@ -44,12 +44,13 @@ tokens =[
     'LPAREN',
     'RPAREN',
     'COMMA',
+    'COMILLA',
     'SEMICOLON',
     'NE', #NOT EQUAL
     'LBRACKET',
     'RBRACKET',
     'LCURLY',
-    'RCURLY',
+    'RCURLY'
 ] + list(reserved.values())
 
 
@@ -96,6 +97,12 @@ def t_CTEI(t):
     t.value = int(t.value)
     return t
 
+#char tokens
+def t_CTEC(t):
+    r"\'[^']\'"
+    t.value = t.value[1]
+    return t
+
 #if errors are detected it prints error message
 def t_error(t):
     print("ERROR at '%s'" % t.value)
@@ -103,94 +110,151 @@ def t_error(t):
 
 lexer = lex.lex()
 
+lexer.input("ab3 = 'a'")
+
+"""while True:
+    tok = lexer.token()
+    if not tok:
+        break
+    print(tok)"""
+
+# parser
+#reglas en minuscula
+# palabrs resevadas en mayuscula
+
+#estructura basica del programa
 def p_prog(p):
     '''
-	prog : vars modules aux
-	prog : vars modules
-	          | aux
-	'''
+    prog : PROGRAM ID SEMICOLON prog_1 END 
+    '''
+    p[0] = 'PROGRAMA COMPILADO'
 
-def p_aux(p):
-    '''
-	aux :  main
-	''' 
-def p_main(p):
-    '''
-	main : MAIN LPAREN param RPAREN LCURLY vars statement RCURLY END
-	'''
 
-def p_tipo(p):
+# aux del prog para evitar ambiguedades
+def p_prog_1(p):
     '''
-    tipo : INT 
-         | FLOAT 
-         | CHAR 
-    '''    
-
-def p_vars(p):
-    '''
-    vars : var 
-         | empty
+    prog_1 : var methods main_1
     '''
 
-def p_var(p): #aux function for vars
+#main del programa
+def p_main_1(p):
     '''
-    var : VAR var2
-    '''  
+    main_1 : MAIN LPAREN RPAREN LCURLY estatutos RCURLY
+    '''
 
+def p_estatutos(p):
+    '''
+    estatutos : asignacion
+        | methods
+        | for
+        | empty
+    '''
+
+def p_asignacion(p):
+    '''
+    asignacion : ID EQUALS expresion SEMICOLON
+    '''
+
+#temporal mientras declara expresiones
+def p_expresion(p):
+    '''
+    expresion : CTEI
+        | CTEF
+        | CTEC
+    '''
+
+
+def p_var(p):
+    '''
+    var : VAR var1
+        | empty
+    '''
+
+#aux de var para agregar variables de otros tipos
 def p_var1(p):
     '''
-        var1 : ID
-            | ID COMMA var1
-            | ID arr 
-            | ID arr COMMA var1
-            | empty
+    var1 : type ID varMulti SEMICOLON var2
     '''
 
-
+# para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
 def p_var2(p):
-    # recursivity for many var types
     '''
-        var2 : var2 tipo var1 SEMICOLON
-             | var2 tipo arr SEMICOLON
-             | var2 tipo mat SEMICOLON
-             | empty
-    ''' 
-
-def p_arr(p):
-    '''
-    arr : LBRACKET CTEI RBRACKET
-        | LBRACKET exp RBRACKET 
-    
-    '''  
-
-def p_modules(p):
-    '''
-    modules : function modules
-            | empty
-    
-    '''     
-
-def p_function1(p):
-    '''
-    function1 : ID LPAREN param RPAREN LCURLY vars statement RCURLY
+    var2 : var1
+        | empty
     '''
 
-def p_function(p):
+
+def p_varMulti(p):
     '''
-    function : FUNCION VOID function1 
-             | FUNCION INT function2 
-             | FUNCION CHAR function2 
-             | FUNCION FLOAT function2
+    varMulti : COMMA ID varMulti
+        | empty
     '''
 
-def p_function2(p):
+def p_type(p):
     '''
-    function2 : ID LPAREN param RPAREN SEMICOLON LCURLY vars statement RETURN exp SEMICOLON RCURLY   
-    ''' 
+    type : INT
+        | FLOAT
+        | CHAR
+    '''
+
+def p_methods(p):
+    '''
+    methods : FUNCION VOID ID LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods
+        | FUNCION type ID LPAREN argumentos RPAREN var LCURLY estatutos RETURN ID SEMICOLON RCURLY methods
+        | empty
+    '''
+
+def p_argumentos(p):
+    '''
+    argumentos : type ID multiArg
+        | empty
+    '''
+
+def p_multiArg(p):
+    '''
+    multiArg : COMMA argumentos
+        | empty
+    '''
+
+
+def p_error(p):
+    print("Syntax Error in input!", p)
 
 
 
 
+def p_empty(p):
+    '''
+    empty : 
+    '''
+
+parser = yacc.yacc()
+
+
+
+
+def main():
+    try:
+        #nombreArchivo = 'test1.txt'
+        nombreArchivo = 'test.txt'
+        arch = open(nombreArchivo, 'r')
+        print("El archivo a leer es: " + nombreArchivo)
+        informacion = arch.read()
+        arch.close()
+        lexer.input(informacion)
+        while True:
+            tok = lexer.token()
+            if not tok:
+                break
+            print(tok)
+        if (parser.parse(informacion, tracking = True) == 'PROGRAMA COMPILADO'):
+            print ("Correct Syntax")
+        else: 
+            print("Syntax error")
+    except EOFError:
+        # print("ERROREOF")
+        print(EOFError)
+main()
 
 
 
