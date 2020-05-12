@@ -7,12 +7,13 @@ reserved = {
     'funcion' : 'FUNCION',
     'var': 'VAR',
     'program': 'PROGRAM',
-    'main':'MAIN',
+    'main' :'MAIN',
     'void' : 'VOID',
     'int' : 'INT',
     'float': 'FLOAT',
     'char' : 'CHAR',
     'if' : 'IF',
+    'then' : 'THEN',
     'else' : 'ELSE',
     'return': 'RETURN',
     'end' : 'END',
@@ -30,6 +31,7 @@ tokens =[
     'CTEI',#int
     'CTEF', #float
     'CTEC', #char
+    'CTESTRING', #string
     'EQUALS',
     'PLUS',
     'MINUS',
@@ -91,6 +93,11 @@ def t_CTEF(t):
     t.value = float(t.value)
     return t
 
+#tokens de strings
+def t_CTESTRING(t):
+    r'\'[\w\d\s\,. ]*\'|\"[\w\d\s\,. ]*\"'
+    return t
+
 #int tokens
 def t_CTEI(t):
     r'0|[-+]?[1-9][0-9]*'
@@ -144,24 +151,101 @@ def p_main_1(p):
 
 def p_estatutos(p):
     '''
-    estatutos : asignacion
-        | methods
-        | for
+    estatutos : asignacion SEMICOLON estatutos
+        | llamadaFun estatutos
+        | lectura estatutos
+        | escritura estatutos
+        | for estatutos
+        | while estatutos
+        | if estatutos
+        | empty
+    '''
+
+def p_for(p):
+    '''
+    for : FOR asignacion TO CTEI LCURLY estatutos RCURLY
+    '''
+
+def p_while(p):
+    '''
+    while : WHILE LPAREN expresion RPAREN LCURLY estatutos RCURLY
+    '''
+
+def p_if(p):
+    '''
+    if : IF LPAREN expresion RPAREN THEN LCURLY estatutos RCURLY else
+    '''
+
+def p_else(p):
+    '''
+    else : ELSE LCURLY estatutos RCURLY
+        | empty
+    '''
+
+def p_return(p):
+    '''
+    return : RETURN expresion SEMICOLON
+    '''
+
+def p_expresion(p):
+    '''
+    expresion : CTEI
+        | CTEF
+    '''
+
+
+
+
+def p_arreglos(p):
+    '''
+    arreglos : type ID LBRACKET CTEI RBRACKET arrAux SEMICOLON 
+    '''
+
+def p_arrAux(p):
+    '''
+    arrAux : COMMA ID LBRACKET CTEI RBRACKET
+        | empty
+    '''
+
+
+def p_escritura(p):
+    '''
+    escritura : PRINT LPAREN escrituraAux RPAREN SEMICOLON
+    '''
+
+def p_escrituraAux(p):
+    '''
+    escrituraAux : ID
+        | COMILLA CTESTRING COMILLA
+        | COMILLA CTESTRING COMILLA COMMA ID
+    '''
+
+
+def p_lectura(p):
+    '''
+    lectura : READ LPAREN lecturaAux RPAREN SEMICOLON
+    ''' 
+
+def p_lecturaAux(p):
+    '''
+    lecturaAux : ID lecturaAux2
+    '''
+
+def p_lecturaAux2(p):
+    '''
+    lecturaAux2 : COMMA lecturaAux
         | empty
     '''
 
 def p_asignacion(p):
     '''
-    asignacion : ID EQUALS expresion SEMICOLON
+    asignacion : ID EQUALS expresion
     '''
 
-#temporal mientras declara expresiones
-def p_expresion(p):
+def p_llamadaFun(p): 
     '''
-    expresion : CTEI
-        | CTEF
-        | CTEC
-    '''
+    llamadaFun : ID LPAREN expresion RPAREN SEMICOLON
+    ''' 
 
 
 def p_var(p):
@@ -174,6 +258,7 @@ def p_var(p):
 def p_var1(p):
     '''
     var1 : type ID varMulti SEMICOLON var2
+        | arreglos
     '''
 
 # para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
@@ -200,7 +285,7 @@ def p_type(p):
 def p_methods(p):
     '''
     methods : FUNCION VOID ID LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods
-        | FUNCION type ID LPAREN argumentos RPAREN var LCURLY estatutos RETURN ID SEMICOLON RCURLY methods
+        | FUNCION type ID LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods
         | empty
     '''
 
