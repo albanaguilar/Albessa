@@ -187,46 +187,10 @@ def p_return(p):
     return : RETURN expresion SEMICOLON
     '''
 
-
-
-
 def p_expresion(p):
     '''
     expresion : CTEI
         | CTEF
-        | llamadaFun
-        | var
-    '''
-
-def p_mulDiv(p):
-    '''
-    mulDiv : expresion MUL expresion
-        | expresion DIV expresion
-    '''
-
-def p_sumRes(p):
-    '''
-    sumRes : expresion PLUS expresion
-        | expresion MINUS expresion
-    '''
-
-def p_or(p):
-    '''
-    or : expresion OR expresion
-    '''
-
-def p_and(p):
-    '''
-    and : expresion AND expresion
-    '''
-
-def p_mayMen(p):
-    '''
-    mayMen : expresion GT expresion
-        | expresion LT expresion
-        | expresion LTE expresion
-        | expresion GTE expresion
-        | expresion NE expresion
     '''
 
 
@@ -376,11 +340,3 @@ def main():
         # print("ERROREOF")
         print(EOFError)
 main()
-
-
-
-
-
-
-
-
