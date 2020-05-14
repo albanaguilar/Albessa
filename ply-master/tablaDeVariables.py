@@ -1,3 +1,5 @@
+import sys
+
 # table of variables, symbols
 class tablaVar:
     def __init__(self): #whith self we can access the atributes of the class
@@ -17,3 +19,20 @@ class tablaVar:
     def printVar(self): #para vr si esta guardada la variable en la tabla
         for i in self.listaVariables:
             print( i, 'se encuentra en la tabla de variables')
+
+
+
+
+#vari = tablaVar()
+#vari.agregar("int", "a")
+#vari.agregar("float", "b")
+#vari.agregar("char", "c")
+#vari.agregar("float", "b")
+#print(vari.buscarVar("b"))
+#vari.printVar()
+
+
+
+
+
+

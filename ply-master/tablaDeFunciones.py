@@ -20,12 +20,8 @@ class tablaFunc():
         else:
             print(id , 'ya existe')
 
-
-
     def buscarFun(self, id):
         return id in self.functions 
-
-
 
     # function to add variable to table function
     # to associate certain variables to certain functions
@@ -37,15 +33,17 @@ class tablaFunc():
             print(id, 'fue añadida exitosamente')
             
 
-
-    def print(self, fid):
+    def printFun(self, fid):
         if id in self.functions:
             self.functions[fid]['variables'].printVar()
         
 
 
 
-
+#funcion = tablaFunc()
+#funcion.agregarFuncion("void", "factores", 2, ["int", "float"], ["a", "b"], 2)
+#print(funcion.buscarFun("factores"))
+#funcion.printFun("factores")
 
 
 
