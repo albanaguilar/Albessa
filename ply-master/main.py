@@ -187,10 +187,57 @@ def p_return(p):
     return : RETURN expresion SEMICOLON
     '''
 
+
+
+    #EXPRESIONES
 def p_expresion(p):
     '''
-    expresion : CTEI
-        | CTEF
+    expresion : expAux
+        | expAux OR expAux
+    ''' 
+
+
+def p_expAux(p):
+    '''
+    expAux : eAux
+         | eAux AND eAux
+    ''' 
+
+def p_eAux(p):
+    '''
+    eAux : masMen 
+        | eAux2 masMen
+    ''' 
+
+
+def p_eAux2(p):
+    '''
+    eAux2 : masMen GT masMen
+        | masMen LT masMen
+        | masMen GTE masMen
+        | masMen LTE masMen
+        | masMen NE masMen 
+    ''' 
+
+def p_masMen(p):
+    '''
+    masMen : mulDiv
+           | mulDiv PLUS mulDiv
+           | mulDiv MINUS mulDiv
+    '''
+def p_mulDiv(p):
+    '''
+    mulDiv : expNum
+           | expNum MUL expNum
+           | expNum DIV expNum
+    '''
+def p_expNum(p):
+    '''
+    expNum : CTEI
+         | CTEF
+         | CTEC
+         | llamadaFun
+         | ID
     '''
 
 

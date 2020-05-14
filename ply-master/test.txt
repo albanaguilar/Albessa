@@ -14,6 +14,7 @@ var int j;
 		i = 3;
 	}
 
+	j = 2 + 2 * 4;
 	return 10;
 
 }
