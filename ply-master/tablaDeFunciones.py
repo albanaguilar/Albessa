@@ -1,14 +1,61 @@
-class tablaVar:
-    def __init__(self): #whith self we can access the atributes of the class in python
-        self.listaVariables = { }
+from tablaDeVariables import tablaVar
+import sys
+
+# function table
+class tablaFunc():
+    def __init__(self): #create dictionary
+        self.functions = { }
+
+
+    def agregarFuncion(self, type, fid, numberParams, paramType, paramsID, numberVars):
+        if fid not in self.functions.keys(): #params to save in the table
+            self.functions[fid] = {
+                'type' : type, 
+                'numberParams' : numberParams,
+                'paramType' : paramType,
+                'paramsID' : paramsID, 
+                'variables' : tablaVar(), #it is done separatly, too many vars
+                'numberVars' : numberVars }
+            print('Funcion añadida:',fid)
+        else:
+            print(id , 'ya existe')
+
+
+
+    def buscarFun(self, id):
+        return id in self.functions 
+
+
+
+    # function to add variable to table function
+    # to associate certain variables to certain functions
+    def agregarVariable(self, fid, tipo, id):
+        if (self.functions[fid]['variables'].buscarFun(id)):
+            print(id, 'ya existe')
+        else:
+            self.functions[fid]['variables'].agregarFuncion(tipo, id)
+            print(id, 'fue añadida exitosamente')
+            
+
+
+    def print(self, fid):
+        if id in self.functions:
+            self.functions[fid]['variables'].printVar()
         
-    def agregar(self, type, id):
-        self. listaVariables[id ] = {
-            'type': type
-        }
-    def buscarVar(self, id):
-        return id in self.listaVariables
-    
-    def print(self): #para ver si esta guardada la variable en la tabla
-        for i in self.listaVariables:
-            print('Variable', i, 'se encuentra en la tabla de variables')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

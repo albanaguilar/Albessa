@@ -1,8 +1,8 @@
 import sys
 import ply.lex as lex
 import ply.yacc as yacc
-from tablaDeFunciones import tablaVar
-
+from tablaDeFunciones import tablaFunc
+from tablaDeVariables import tablaVar
 
 #reserved words from the language
 reserved = {
