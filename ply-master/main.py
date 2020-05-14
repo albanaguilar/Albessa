@@ -1,5 +1,7 @@
+import sys
 import ply.lex as lex
 import ply.yacc as yacc
+from tablaDeFunciones import tablaVar
 
 
 #reserved words from the language
@@ -27,32 +29,10 @@ reserved = {
 
 #tokens are declared
 tokens =[
-    'ID',
-    'CTEI',#int
-    'CTEF', #float
-    'CTEC', #char
-    'CTESTRING', #string
-    'EQUALS',
-    'PLUS',
-    'MINUS',
-    'MUL',
-    'DIV',
-    'LT', #<
-    'GT', #>
-    'LTE', #<=
-    'GTE', #>=
-    'AND', 
-    'OR', 
-    'LPAREN',
-    'RPAREN',
-    'COMMA',
-    'COMILLA',
-    'SEMICOLON',
-    'NE', #NOT EQUAL
-    'LBRACKET',
-    'RBRACKET',
-    'LCURLY',
-    'RCURLY'
+    'ID', 'CTEI', 'CTEF', 'CTEC', 'CTESTRING', 'EQUALS', 
+    'PLUS', 'MINUS', 'MUL', 'DIV', 'LT', 'GT', 'LTE', 'GTE', 
+    'AND', 'OR', 'LPAREN', 'RPAREN', 'COMMA','COMILLA', 
+    'SEMICOLON', 'NE', 'LBRACKET', 'RBRACKET', 'LCURLY', 'RCURLY'
 ] + list(reserved.values())
 
 
@@ -87,17 +67,6 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
-#float tokens
-def t_CTEF(t):
-    r'[-+]?\d*\.\d+'
-    t.value = float(t.value)
-    return t
-
-#tokens de strings
-def t_CTESTRING(t):
-    r'\'[\w\d\s\,. ]*\'|\"[\w\d\s\,. ]*\"'
-    return t
-
 #int tokens
 def t_CTEI(t):
     r'0|[-+]?[1-9][0-9]*'
@@ -110,6 +79,17 @@ def t_CTEC(t):
     t.value = t.value[1]
     return t
 
+#float tokens
+def t_CTEF(t):
+    r'[-+]?\d*\.\d+'
+    t.value = float(t.value)
+    return t
+
+#tokens de strings
+def t_CTESTRING(t):
+    r'\'[\w\d\s\,. ]*\'|\"[\w\d\s\,. ]*\"'
+    return t
+
 #if errors are detected it prints error message
 def t_error(t):
     print("ERROR at '%s'" % t.value)
@@ -118,12 +98,6 @@ def t_error(t):
 lexer = lex.lex()
 
 lexer.input("ab3 = 'a'")
-
-"""while True:
-    tok = lexer.token()
-    if not tok:
-        break
-    print(tok)"""
 
 # parser
 #reglas en minuscula
@@ -187,9 +161,6 @@ def p_return(p):
     return : RETURN expresion SEMICOLON
     '''
 
-
-
-    #EXPRESIONES
 def p_expresion(p):
     '''
     expresion : expAux
@@ -239,8 +210,6 @@ def p_expNum(p):
          | llamadaFun
          | ID
     '''
-
-
 
 
 def p_arreglos(p):
@@ -352,9 +321,6 @@ def p_multiArg(p):
 def p_error(p):
     print("Syntax Error in input!", p)
 
-
-
-
 def p_empty(p):
     '''
     empty : 
@@ -363,11 +329,8 @@ def p_empty(p):
 parser = yacc.yacc()
 
 
-
-
 def main():
     try:
-        #nombreArchivo = 'test1.txt'
         nombreArchivo = 'test.txt'
         arch = open(nombreArchivo, 'r')
         print("El archivo a leer es: " + nombreArchivo)
@@ -384,6 +347,5 @@ def main():
         else: 
             print("Syntax error")
     except EOFError:
-        # print("ERROREOF")
         print(EOFError)
 main()
