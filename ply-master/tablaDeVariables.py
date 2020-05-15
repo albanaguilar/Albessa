@@ -22,6 +22,7 @@ class tablaVar:
 
 
 
+#test
 
 #vari = tablaVar()
 #vari.agregar("int", "a")

@@ -19,7 +19,7 @@ var int j;
 
 }
 
-funcion void factores ()
+funcion void factores2 ()
 var float po;
 int arreglo[4];
 {

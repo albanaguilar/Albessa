@@ -3,6 +3,19 @@ import ply.lex as lex
 import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
+from cuboSemantico import cuboSemantico
+
+#objeto
+tablaFunc = tablaFunc()
+tablaVar = tablaVar()
+
+
+variableActualTipo = ''
+variableActualID = ''
+
+funcionActualTipo = ''
+funcionActualID = ''
+
 
 #reserved words from the language
 reserved = {
@@ -106,9 +119,24 @@ lexer.input("ab3 = 'a'")
 #estructura basica del programa
 def p_prog(p):
     '''
-    prog : PROGRAM ID SEMICOLON prog_1 END 
+    prog : PROGRAM ID inicializarProg SEMICOLON prog_1 END 
     '''
     p[0] = 'PROGRAMA COMPILADO'
+
+#considera -1 al ID, inicializarProg es el indice 0
+def p_inicializarProg(p):
+    '''
+    inicializarProg : 
+    '''
+
+    #PUNTOS NEURALGICOS: puntos que van a hacer una funcion, dentro del parser
+    global funcionActualID, funcionActualTipo
+    #print(p[-2])
+    funcionActualID = p[-1]
+    funcionActualTipo = 'programa'
+
+    #type, fid, numberParams, paramType, paramsID, numberVars
+    tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
 
 
 # aux del prog para evitar ambiguedades
@@ -120,8 +148,20 @@ def p_prog_1(p):
 #main del programa
 def p_main_1(p):
     '''
-    main_1 : MAIN LPAREN RPAREN LCURLY estatutos RCURLY
+    main_1 : MAIN agregarMain LPAREN RPAREN LCURLY estatutos RCURLY
     '''
+
+def p_agregarMain(p):
+    '''
+    agregarMain : 
+    '''
+    global funcionActualID, funcionActualTipo
+    funcionActualID = p[-1]
+    funcionActualTipo = 'main'
+
+    #type, fid, numberParams, paramType, paramsID, numberVars
+    tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
+
 
 def p_estatutos(p):
     '''
@@ -180,7 +220,6 @@ def p_eAux(p):
         | eAux2 masMen
     ''' 
 
-
 def p_eAux2(p):
     '''
     eAux2 : masMen GT masMen
@@ -209,6 +248,7 @@ def p_expNum(p):
          | CTEC
          | llamadaFun
          | ID
+         | LPAREN expresion RPAREN
     '''
 
 
@@ -293,17 +333,45 @@ def p_varMulti(p):
 
 def p_type(p):
     '''
-    type : INT
-        | FLOAT
-        | CHAR
+    type : INT returnTipo
+        | FLOAT returnTipo
+        | CHAR returnTipo
     '''
+
+def p_returnTipo(p):
+    '''
+    returnTipo : 
+    '''
+
+    global variableActualTipo, funcionActualTipo
+    funcionActualTipo = p[-1]
+
 
 def p_methods(p):
     '''
-    methods : FUNCION VOID ID LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods
-        | FUNCION type ID LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods
+    methods : FUNCION VOID ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods
+        | FUNCION type ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods
         | empty
     '''
+
+
+#puntos neuralgicos
+def p_agregarFuncion(p):
+    '''
+    agregarFuncion : 
+    '''
+
+    global funcionActualID, funcionActualTipo
+    funcionActualID = p[-1]
+
+    if p[-2] == 'void':
+        funcionActualTipo = 'void'
+    
+
+    #type, fid, numberParams, paramType, paramsID, numberVars
+    tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
+
+
 
 def p_argumentos(p):
     '''

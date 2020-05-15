@@ -16,7 +16,7 @@ class tablaFunc():
                 'paramsID' : paramsID, 
                 'variables' : tablaVar(), #it is done separatly, too many vars
                 'numberVars' : numberVars }
-            print('Funcion añadida:',fid)
+            print('Funcion añadida:',fid, ' ', type)
         else:
             print(id , 'ya existe')
 
@@ -36,9 +36,12 @@ class tablaFunc():
     def printFun(self, fid):
         if id in self.functions:
             self.functions[fid]['variables'].printVar()
+
+
         
 
 
+#test
 
 #funcion = tablaFunc()
 #funcion.agregarFuncion("void", "factores", 2, ["int", "float"], ["a", "b"], 2)
