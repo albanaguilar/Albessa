@@ -317,6 +317,8 @@ def p_var1(p):
         | arreglos
     '''
 
+#add variable regla despues de ID y agregar todas las variables a una funcion
+
 # para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
 def p_var2(p):
     '''
