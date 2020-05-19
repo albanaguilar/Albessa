@@ -7,13 +7,11 @@ class tablaFunc():
         self.functions = { }
 
 
-    def agregarFuncion(self, type, fid, numberParams, paramType, paramsID, numberVars):
+    def agregarFuncion(self, type, functionName, numberParams, paramType, vars, numberVars):
         if fid not in self.functions.keys(): #params to save in the table
             self.functions[fid] = {
-                'type' : type, 
-                'numberParams' : numberParams,
-                'paramType' : paramType,
-                'paramsID' : paramsID, 
+                'type' : type, 'numberParams' : numberParams,
+                'paramType' : paramType, 'vars' : vars, 
                 'variables' : tablaVar(), #it is done separatly, too many vars
                 'numberVars' : numberVars }
             print('Funcion añadida:',fid, ' ', type)
@@ -25,17 +23,17 @@ class tablaFunc():
 
     # function to add variable to table function
     # to associate certain variables to certain functions
-    def agregarVariable(self, fid, tipo, id):
-        if (self.functions[fid]['variables'].buscarFun(id)):
+    def agregarVariable(self, functionName, tipo, id):
+        if (self.functions[functionName]['variables'].buscarVar(id)):
             print(id, 'ya existe')
         else:
-            self.functions[fid]['variables'].agregarFuncion(tipo, id)
+            self.functions[functionName]['variables'].agregar(tipo, id)
             print(id, 'fue añadida exitosamente')
             
 
-    def printFun(self, fid):
+    def printFun(self, functionName):
         if id in self.functions:
-            self.functions[fid]['variables'].printVar()
+            self.functions[functionName]['variables'].printVar()
 
 
         

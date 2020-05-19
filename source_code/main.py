@@ -45,7 +45,7 @@ tokens =[
     'ID', 'CTEI', 'CTEF', 'CTEC', 'CTESTRING', 'EQUALS', 
     'PLUS', 'MINUS', 'MUL', 'DIV', 'LT', 'GT', 'LTE', 'GTE', 
     'AND', 'OR', 'LPAREN', 'RPAREN', 'COMMA','COMILLA', 
-    'SEMICOLON', 'NE', 'LBRACKET', 'RBRACKET', 'LCURLY', 'RCURLY'
+    'SEMICOLON', 'NE', 'LBRACKET', 'RBRACKET', 'LCURLY', 'RCURLY', 'EE'
 ] + list(reserved.values())
 
 
@@ -71,6 +71,7 @@ t_LTE = r'\<='
 t_NE = r'\<>' 
 t_AND = r'\&&'
 t_OR = r'\|'
+t_EE = r'\=='
 t_ignore = ' \t\n'
 
 
@@ -137,7 +138,7 @@ def p_inicializarProg(p):
 
     #type, fid, numberParams, paramType, paramsID, numberVars
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
-
+    tablaFunc.printFun(funcionActualID)
 
 # aux del prog para evitar ambiguedades
 def p_prog_1(p):
@@ -161,7 +162,7 @@ def p_agregarMain(p):
 
     #type, fid, numberParams, paramType, paramsID, numberVars
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
-
+    tablaFunc.printFun(funcionActualID)
 
 def p_estatutos(p):
     '''
@@ -313,11 +314,22 @@ def p_var(p):
 #aux de var para agregar variables de otros tipos
 def p_var1(p):
     '''
-    var1 : type ID varMulti SEMICOLON var2
+    var1 : type ID addVariable varMulti SEMICOLON var2
         | arreglos
     '''
 
-#add variable regla despues de ID y agregar todas las variables a una funcion
+def p_addVariable(p):
+    '''
+    addVariable : 
+    '''
+
+    global funcionActualID, variableActualTipo,funcionActualTipo
+
+    funcionActualTipo = p[-2]
+    variableActualID = p[-1]
+
+    tablaFunc.agregarVariable(funcionActualID , variableActualTipo, variableActualID)
+    tablaFunc.printFun(funcionActualID)
 
 # para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
 def p_var2(p):
@@ -329,7 +341,7 @@ def p_var2(p):
 
 def p_varMulti(p):
     '''
-    varMulti : COMMA ID varMulti
+    varMulti : COMMA ID addVariable varMulti
         | empty
     '''
 

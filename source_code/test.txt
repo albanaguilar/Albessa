@@ -1,8 +1,8 @@
 program foreverAlone;
 
-var int i, j, d, h;
+var int i,j,k;
 float po;
-char doo, y, mj;
+char doo;
 
 funcion int factores (int i, float po)
 var int j;
@@ -20,10 +20,10 @@ var int j;
 }
 
 funcion void factores2 ()
-var float po;
+var float po, lo, io;
 int arreglo[4];
 {
-	for i = 0 to 9{
+	for p = 0 to 9{
 		read (p, a, b);
 	}
 	
