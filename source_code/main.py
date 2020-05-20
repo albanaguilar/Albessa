@@ -4,6 +4,8 @@ import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
 from cuboSemantico import cuboSemantico
+from queue import Queue
+from stack import Stack
 
 #objeto
 tablaFunc = tablaFunc()
