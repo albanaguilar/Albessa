@@ -1,6 +1,5 @@
 import sys
 
-# queue that only has enqueue and dequeue operations
 class Queue:
 
     def __init__(self):

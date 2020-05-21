@@ -18,6 +18,9 @@ variableActualID = ''
 funcionActualTipo = ''
 funcionActualID = ''
 
+pilaOperadores = Stack()
+nombres_tipos = Stack()
+
 
 #reserved words from the language
 reserved = {
@@ -138,7 +141,6 @@ def p_inicializarProg(p):
     funcionActualID = p[-1]
     funcionActualTipo = 'programa'
 
-    #type, fid, numberParams, paramType, paramsID, numberVars
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
     tablaFunc.printFun(funcionActualID)
 
@@ -204,17 +206,32 @@ def p_return(p):
     return : RETURN expresion SEMICOLON
     '''
 
+
+#Regla para guardar en una pila los operadores usados
+def p_guardarOp(p):
+    '''
+    guardarOp : 
+    '''
+
+    global operador
+
+    operador = p[-1]
+    pilaOperadores.push( operador )
+    print( pilaOperadores.peek() )
+
+
+
 def p_expresion(p):
     '''
     expresion : expAux
-        | expAux OR expAux
+        | expAux OR guardarOp expAux
     ''' 
 
 
 def p_expAux(p):
     '''
     expAux : eAux
-         | eAux AND eAux
+         | eAux AND guardarOp eAux
     ''' 
 
 def p_eAux(p):
@@ -225,24 +242,24 @@ def p_eAux(p):
 
 def p_eAux2(p):
     '''
-    eAux2 : masMen GT masMen
-        | masMen LT masMen
-        | masMen GTE masMen
-        | masMen LTE masMen
-        | masMen NE masMen 
+    eAux2 : masMen GT guardarOp masMen
+        | masMen LT guardarOp masMen
+        | masMen GTE guardarOp masMen
+        | masMen LTE guardarOp masMen
+        | masMen NE guardarOp masMen 
     ''' 
 
 def p_masMen(p):
     '''
     masMen : mulDiv
-           | mulDiv PLUS mulDiv
-           | mulDiv MINUS mulDiv
+           | mulDiv PLUS guardarOp mulDiv
+           | mulDiv MINUS guardarOp mulDiv
     '''
 def p_mulDiv(p):
     '''
     mulDiv : expNum
-           | expNum MUL expNum
-           | expNum DIV expNum
+           | expNum MUL guardarOp expNum
+           | expNum DIV guardarOp expNum
     '''
 def p_expNum(p):
     '''

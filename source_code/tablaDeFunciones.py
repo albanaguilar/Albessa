@@ -8,13 +8,13 @@ class tablaFunc():
 
 
     def agregarFuncion(self, type, functionName, numberParams, paramType, vars, numberVars):
-        if fid not in self.functions.keys(): #params to save in the table
-            self.functions[fid] = {
+        if functionName not in self.functions.keys(): #params to save in the table
+            self.functions[functionName] = {
                 'type' : type, 'numberParams' : numberParams,
                 'paramType' : paramType, 'vars' : vars, 
                 'variables' : tablaVar(), #it is done separatly, too many vars
                 'numberVars' : numberVars }
-            print('Funcion añadida:',fid, ' ', type)
+            print('Funcion añadida:',functionName, ' ', type)
         else:
             print(id , 'ya existe')
 
