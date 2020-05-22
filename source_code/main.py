@@ -3,24 +3,27 @@ import ply.lex as lex
 import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
+from nombreTipo import nombreTipo
 from cuboSemantico import cuboSemantico
 from queue import Queue
 from stack import Stack
 
-#objeto
+# Objetos
 tablaFunc = tablaFunc()
 tablaVar = tablaVar()
 
+#pilaOperadores = Stack()
+nombresVariables_y_tipoDatos = Stack()
 
+
+#Variables globales
 variableActualTipo = ''
 variableActualID = ''
 
 funcionActualTipo = ''
 funcionActualID = ''
-
-pilaOperadores = Stack()
-nombres_tipos = Stack()
-
+listaOperadores = []
+lista_NombresVariables_y_tipoDatos = []
 
 #reserved words from the language
 reserved = {
@@ -216,9 +219,8 @@ def p_guardarOp(p):
     global operador
 
     operador = p[-1]
-    pilaOperadores.push( operador )
-    print( pilaOperadores.peek() )
-
+    listaOperadores.append(operador)
+    print(listaOperadores[-1])
 
 
 def p_expresion(p):
@@ -337,6 +339,13 @@ def p_var1(p):
         | arreglos
     '''
 
+def p_varMulti(p):
+    '''
+    varMulti : COMMA ID addVariable varMulti
+        | empty
+    '''
+
+#se agregan las variables, sus nombres y tipos a la tabla de funciones 
 def p_addVariable(p):
     '''
     addVariable : 
@@ -344,11 +353,15 @@ def p_addVariable(p):
 
     global funcionActualID, variableActualTipo,funcionActualTipo
 
-    funcionActualTipo = p[-2]
     variableActualID = p[-1]
 
     tablaFunc.agregarVariable(funcionActualID , variableActualTipo, variableActualID)
-    tablaFunc.printFun(funcionActualID)
+    #tablaFunc.printFun(funcionActualID)
+    nom_y_tipo = nombreTipo(variableActualTipo, variableActualID)
+    nombresVariables_y_tipoDatos.push(nom_y_tipo)
+    #print( nombresVariables_y_tipoDatos.peek().identificador )
+    #print( nombresVariables_y_tipoDatos.peek().type )
+
 
 # para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
 def p_var2(p):
@@ -357,19 +370,20 @@ def p_var2(p):
         | empty
     '''
 
-
-def p_varMulti(p):
-    '''
-    varMulti : COMMA ID addVariable varMulti
-        | empty
-    '''
-
 def p_type(p):
     '''
-    type : INT returnTipo
-        | FLOAT returnTipo
-        | CHAR returnTipo
+    type : INT returnTipo regresaTipoVar
+        | FLOAT returnTipo regresaTipoVar
+        | CHAR returnTipo regresaTipoVar
     '''
+
+def p_regresaTipoVar(p):
+    '''
+    regresaTipoVar :
+    '''
+
+    global variableActualTipo
+    variableActualTipo = p[-2]
 
 def p_returnTipo(p):
     '''
