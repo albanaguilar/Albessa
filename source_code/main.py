@@ -4,8 +4,7 @@ import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
 from nombreTipo import nombreTipo
-from cuboSemantico import cuboSemantico
-from queue import Queue
+from cuboSemantico import CuboS
 from stack import Stack
 
 # Objetos
