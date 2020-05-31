@@ -2,254 +2,254 @@ import sys
 from collections import defaultdict
 
 #cubo semantico sirve para cuando se hacen operaciones aritmeticas, logicas, comparaciones, asignaciones
-class CuboS:
+
+#para inicializar el dicionario, defaultdict es una clase de colections
+cuboSemantico = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: None)))
 	
-	def __init__(self):
-		#para inicializar el dicionario, defaultdict es una clase de colections
-		cuboSemantico = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: None)))
-	
-		##############################################################
-		############ PLUS ##########################################
-		cuboSemantico['int']['int']['+'] = 'int' #int con int
+##############################################################
+############ PLUS ##########################################
+cuboSemantico['int']['int']['+'] = 'int' #int con int
+cuboSemantico['int']['float']['+'] = 'float' # int con float
+cuboSemantico['float']['int']['+'] = 'float'
 
-		cuboSemantico['int']['float']['+'] = 'float' # int con float
-		cuboSemantico['float']['int']['+'] = 'float'
+cuboSemantico['int']['char']['+'] = 'error' # int con char
+cuboSemantico['char']['int']['+'] = 'error'
 
-		cuboSemantico['int']['char']['+'] = 'error' # int con char
-		cuboSemantico['char']['int']['+'] = 'error'
+cuboSemantico['char']['float']['+'] = 'error' 
+cuboSemantico['float']['char']['+'] = 'error'  # float con char
 
-		cuboSemantico['char']['float']['+'] = 'error' 
-		cuboSemantico['float']['char']['+'] = 'error'  # float con char
+cuboSemantico['float']['float']['+'] = 'float'  # float con float
 
-		cuboSemantico['float']['float']['+'] = 'float'  # float con float
+cuboSemantico['char']['char']['+'] = 'error' # char con char
 
-		cuboSemantico['char']['char']['+'] = 'error' # char con char
 
 
+############################################################
+############ MINUS #############################################
+cuboSemantico['int']['int']['-'] = 'int' #int con int
 
+cuboSemantico['int']['float']['-'] = 'float' # int con float
+cuboSemantico['float']['int']['-'] = 'float'
 
-		############################################################
-		############ MINUS #############################################
-		cuboSemantico['int']['int']['-'] = 'int' #int con int
+cuboSemantico['int']['char']['-'] = 'error' # int con char
+cuboSemantico['char']['int']['-'] = 'error'
 
-		cuboSemantico['int']['float']['-'] = 'float' # int con float
-		cuboSemantico['float']['int']['-'] = 'float'
+cuboSemantico['char']['float']['-'] = 'error' 
+cuboSemantico['float']['char']['-'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['-'] = 'error' # int con char
-		cuboSemantico['char']['int']['-'] = 'error'
+cuboSemantico['float']['float']['-'] = 'float'  # float con float
 
-		cuboSemantico['char']['float']['-'] = 'error' 
-		cuboSemantico['float']['char']['-'] = 'error'  # float con char
+cuboSemantico['char']['char']['-'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['-'] = 'float'  # float con float
 
-		cuboSemantico['char']['char']['-'] = 'error' # char con char
 
 
+############################################################
+############# MULTIPLICATION ##############################
+cuboSemantico['int']['int']['*'] = 'int' #int con int
 
+cuboSemantico['int']['float']['*'] = 'float' # int con float
+cuboSemantico['float']['int']['*'] = 'float'
 
-		############################################################
-		############# MULTIPLICATION ##############################
-		cuboSemantico['int']['int']['*'] = 'int' #int con int
+cuboSemantico['int']['char']['*'] = 'error' # int con char
+cuboSemantico['char']['int']['*'] = 'error'
 
-		cuboSemantico['int']['float']['*'] = 'float' # int con float
-		cuboSemantico['float']['int']['*'] = 'float'
+cuboSemantico['char']['float']['*'] = 'error' 
+cuboSemantico['float']['char']['*'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['*'] = 'error' # int con char
-		cuboSemantico['char']['int']['*'] = 'error'
+cuboSemantico['float']['float']['*'] = 'float'  # float con float
 
-		cuboSemantico['char']['float']['*'] = 'error' 
-		cuboSemantico['float']['char']['*'] = 'error'  # float con char
+cuboSemantico['char']['char']['*'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['*'] = 'float'  # float con float
 
-		cuboSemantico['char']['char']['*'] = 'error' # char con char
 
 
 
+##########################################################
+############ DIVISION #######################################
+cuboSemantico['int']['int']['/'] = 'int' #int con int
 
+cuboSemantico['int']['float']['/'] = 'float' # int con float
+cuboSemantico['float']['int']['/'] = 'float'
 
-		##########################################################
-		############ DIVISION #######################################
-		cuboSemantico['int']['int']['/'] = 'int' #int con int
+cuboSemantico['int']['char']['/'] = 'error' # int con char
+cuboSemantico['char']['int']['/'] = 'error'
 
-		cuboSemantico['int']['float']['/'] = 'float' # int con float
-		cuboSemantico['float']['int']['/'] = 'float'
+cuboSemantico['char']['float']['/'] = 'error' 
+cuboSemantico['float']['char']['/'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['/'] = 'error' # int con char
-		cuboSemantico['char']['int']['/'] = 'error'
+cuboSemantico['float']['float']['/'] = 'float'  # float con float
 
-		cuboSemantico['char']['float']['/'] = 'error' 
-		cuboSemantico['float']['char']['/'] = 'error'  # float con char
+cuboSemantico['char']['char']['/'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['/'] = 'float'  # float con float
 
-		cuboSemantico['char']['char']['/'] = 'error' # char con char
 
 
+#############################################################
+################## GREATER THAN #############################
+cuboSemantico['int']['int']['>'] = 'bool' #int con int
 
+cuboSemantico['int']['float']['>'] = 'bool' # int con float
+cuboSemantico['float']['int']['>'] = 'bool'
 
-		#############################################################
-		################## GREATER THAN #############################
-		cuboSemantico['int']['int']['>'] = 'bool' #int con int
+cuboSemantico['int']['char']['>'] = 'error' # int con char
+cuboSemantico['char']['int']['>'] = 'error'
 
-		cuboSemantico['int']['float']['>'] = 'bool' # int con float
-		cuboSemantico['float']['int']['>'] = 'bool'
+cuboSemantico['char']['float']['>'] = 'error' 
+cuboSemantico['float']['char']['>'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['>'] = 'error' # int con char
-		cuboSemantico['char']['int']['>'] = 'error'
+cuboSemantico['float']['float']['>'] = 'bool'  # float con float
 
-		cuboSemantico['char']['float']['>'] = 'error' 
-		cuboSemantico['float']['char']['>'] = 'error'  # float con char
+cuboSemantico['char']['char']['>'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['>'] = 'bool'  # float con float
 
-		cuboSemantico['char']['char']['>'] = 'error' # char con char
 
 
+#############################################################
+############### LESS THAN #####################################
+cuboSemantico['int']['int']['<'] = 'bool' #int con int
 
+cuboSemantico['int']['float']['<'] = 'bool' # int con float
+cuboSemantico['float']['int']['<'] = 'bool'
 
-		#############################################################
-		############### LESS THAN #####################################
-		cuboSemantico['int']['int']['<'] = 'bool' #int con int
+cuboSemantico['int']['char']['<'] = 'error' # int con char
+cuboSemantico['char']['int']['<'] = 'error'
 
-		cuboSemantico['int']['float']['<'] = 'bool' # int con float
-		cuboSemantico['float']['int']['<'] = 'bool'
+cuboSemantico['char']['float']['<'] = 'error' 
+cuboSemantico['float']['char']['<'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['<'] = 'error' # int con char
-		cuboSemantico['char']['int']['<'] = 'error'
+cuboSemantico['float']['float']['<'] = 'bool'  # float con float
 
-		cuboSemantico['char']['float']['<'] = 'error' 
-		cuboSemantico['float']['char']['<'] = 'error'  # float con char
+cuboSemantico['char']['char']['<'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['<'] = 'bool'  # float con float
 
-		cuboSemantico['char']['char']['<'] = 'error' # char con char
 
 
 
+###############################################################
+############### GREATER EQUAL THAN ##############################
+cuboSemantico['int']['int']['=>'] = 'bool' #int con int
 
+cuboSemantico['int']['float']['=>'] = 'bool' # int con float
+cuboSemantico['float']['int']['=>'] = 'bool'
 
-		###############################################################
-		############### GREATER EQUAL THAN ##############################
-		cuboSemantico['int']['int']['=>'] = 'bool' #int con int
+cuboSemantico['int']['char']['=>'] = 'error' # int con char
+cuboSemantico['char']['int']['=>'] = 'error'
 
-		cuboSemantico['int']['float']['=>'] = 'bool' # int con float
-		cuboSemantico['float']['int']['=>'] = 'bool'
+cuboSemantico['char']['float']['=>'] = 'error' 
+cuboSemantico['float']['char']['=>'] = 'error'  # float con char
 
-		cuboSemantico['int']['char']['=>'] = 'error' # int con char
-		cuboSemantico['char']['int']['=>'] = 'error'
+cuboSemantico['float']['float']['=>'] = 'bool'  # float con float
 
-		cuboSemantico['char']['float']['=>'] = 'error' 
-		cuboSemantico['float']['char']['=>'] = 'error'  # float con char
+cuboSemantico['char']['char']['=>'] = 'error' # char con char
 
-		cuboSemantico['float']['float']['=>'] = 'bool'  # float con float
 
-		cuboSemantico['char']['char']['=>'] = 'error' # char con char
 
 
+####################################################################
+############### LESS EQUAL THAN ###############################
+cuboSemantico['int']['int']['<='] = 'bool' #int con int
 
+cuboSemantico['int']['float']['<='] = 'bool' # int con float
+cuboSemantico['float']['int']['<='] = 'bool'
 
+cuboSemantico['int']['char']['<='] = 'error' # int con char
+cuboSemantico['char']['int']['<='] = 'error'
 
-		####################################################################
-		############### LESS EQUAL THAN ###############################
-		cuboSemantico['int']['int']['<='] = 'bool' #int con int
+cuboSemantico['char']['float']['<='] = 'error' 
+cuboSemantico['float']['char']['<='] = 'error'  # float con char
 
-		cuboSemantico['int']['float']['<='] = 'bool' # int con float
-		cuboSemantico['float']['int']['<='] = 'bool'
+cuboSemantico['float']['float']['<='] = 'bool'  # float con float
 
-		cuboSemantico['int']['char']['<='] = 'error' # int con char
-		cuboSemantico['char']['int']['<='] = 'error'
+cuboSemantico['char']['char']['<='] = 'error' # char con char
 
-		cuboSemantico['char']['float']['<='] = 'error' 
-		cuboSemantico['float']['char']['<='] = 'error'  # float con char
 
-		cuboSemantico['float']['float']['<='] = 'bool'  # float con float
 
-		cuboSemantico['char']['char']['<='] = 'error' # char con char
 
+#################################################################
+################ DIFERENT NOT EQUAL ############################
+cuboSemantico['int']['int']['<>'] = 'bool' #int con int
 
+cuboSemantico['int']['float']['<>'] = 'bool' # int con float
+cuboSemantico['float']['int']['<>'] = 'bool'
 
+cuboSemantico['int']['char']['<>'] = 'error' # int con char
+cuboSemantico['char']['int']['<>'] = 'error'
 
+cuboSemantico['char']['float']['<>'] = 'error' 
+cuboSemantico['float']['char']['<>'] = 'error'  # float con char
 
+cuboSemantico['float']['float']['<>'] = 'bool'  # float con float
 
+cuboSemantico['char']['char']['<>'] = 'bool' # char con char
 
-		#################################################################
-		################ DIFERENT NOT EQUAL ############################
-		cuboSemantico['int']['int']['<>'] = 'bool' #int con int
 
-		cuboSemantico['int']['float']['<>'] = 'bool' # int con float
-		cuboSemantico['float']['int']['<>'] = 'bool'
 
-		cuboSemantico['int']['char']['<>'] = 'error' # int con char
-		cuboSemantico['char']['int']['<>'] = 'error'
+##################################################################
+################ AND ##############################################
+cuboSemantico['int']['int']['&&'] = 'bool' #int con int
 
-		cuboSemantico['char']['float']['<>'] = 'error' 
-		cuboSemantico['float']['char']['<>'] = 'error'  # float con char
+cuboSemantico['int']['float']['&&'] = 'bool' # int con float
+cuboSemantico['float']['int']['&&'] = 'bool'
 
-		cuboSemantico['float']['float']['<>'] = 'bool'  # float con float
+cuboSemantico['int']['char']['&&'] = 'error' # int con char
+cuboSemantico['char']['int']['&&'] = 'error'
 
-		cuboSemantico['char']['char']['<>'] = 'bool' # char con char
+cuboSemantico['char']['float']['&&'] = 'error' 
+cuboSemantico['float']['char']['&&'] = 'error'  # float con char
 
+cuboSemantico['float']['float']['&&'] = 'bool'  # float con float
 
+cuboSemantico['char']['char']['&&'] = 'error' # char con char
 
 
-		##################################################################
-		################ AND ##############################################
-		cuboSemantico['int']['int']['&&'] = 'bool' #int con int
 
-		cuboSemantico['int']['float']['&&'] = 'bool' # int con float
-		cuboSemantico['float']['int']['&&'] = 'bool'
+##################################################################
+############## OR ###################################################
+cuboSemantico['int']['int']['|'] = 'bool' #int con int
 
-		cuboSemantico['int']['char']['&&'] = 'error' # int con char
-		cuboSemantico['char']['int']['&&'] = 'error'
+cuboSemantico['int']['float']['|'] = 'bool' # int con float
+cuboSemantico['float']['int']['|'] = 'bool'
 
-		cuboSemantico['char']['float']['&&'] = 'error' 
-		cuboSemantico['float']['char']['&&'] = 'error'  # float con char
+cuboSemantico['int']['char']['|'] = 'error' # int con char
+cuboSemantico['char']['int']['|'] = 'error'
 
-		cuboSemantico['float']['float']['&&'] = 'bool'  # float con float
+cuboSemantico['char']['float']['|'] = 'error' 
+cuboSemantico['float']['char']['|'] = 'error'  # float con char
 
-		cuboSemantico['char']['char']['&&'] = 'error' # char con char
+cuboSemantico['float']['float']['|'] = 'bool'  # float con float
 
+cuboSemantico['char']['char']['|'] = 'error' # char con char
 
 
 
+######################################################################
+############# EQUAL ##################################################
+cuboSemantico['int']['int']['='] = 'int' #int con int
 
-		##################################################################
-		############## OR ###################################################
-		cuboSemantico['int']['int']['|'] = 'bool' #int con int
+cuboSemantico['int']['float']['='] = 'float' # int con float
+cuboSemantico['float']['int']['='] = 'float'
 
-		cuboSemantico['int']['float']['|'] = 'bool' # int con float
-		cuboSemantico['float']['int']['|'] = 'bool'
+cuboSemantico['int']['char']['='] = 'error' # int con char
+cuboSemantico['char']['int']['='] = 'error'
 
-		cuboSemantico['int']['char']['|'] = 'error' # int con char
-		cuboSemantico['char']['int']['|'] = 'error'
+cuboSemantico['char']['float']['='] = 'error' 
+cuboSemantico['float']['char']['='] = 'error'  # float con char
 
-		cuboSemantico['char']['float']['|'] = 'error' 
-		cuboSemantico['float']['char']['|'] = 'error'  # float con char
+cuboSemantico['float']['float']['='] = 'float'  # float con float
 
-		cuboSemantico['float']['float']['|'] = 'bool'  # float con float
+cuboSemantico['char']['char']['='] = 'char' # char con char
 
-		cuboSemantico['char']['char']['|'] = 'error' # char con char
+def getType( left,right, operator):
+	return cuboSemantico[left][right][operator]
 
 
 
-		######################################################################
-		############# EQUAL ##################################################
-		cuboSemantico['int']['int']['='] = 'int' #int con int
+def main():
+	getType('float', 'float', '+')
 
-		cuboSemantico['int']['float']['='] = 'float' # int con float
-		cuboSemantico['float']['int']['='] = 'float'
 
-		cuboSemantico['int']['char']['='] = 'error' # int con char
-		cuboSemantico['char']['int']['='] = 'error'
-
-		cuboSemantico['char']['float']['='] = 'error' 
-		cuboSemantico['float']['char']['='] = 'error'  # float con char
-
-		cuboSemantico['float']['float']['='] = 'float'  # float con float
-
-		cuboSemantico['char']['char']['='] = 'char' # char con char
+main()
 
 
 

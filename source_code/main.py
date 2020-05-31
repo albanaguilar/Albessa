@@ -4,16 +4,18 @@ import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
 from nombreTipo import nombreTipo
-from cuboSemantico import CuboS
+from cuboSemantico import *
+from quadruplos import Quadruplo, Operaciones
 from stack import Stack
 
 # Objetos
 tablaFunc = tablaFunc()
 tablaVar = tablaVar()
-
-#pilaOperadores = Stack()
 nombresVariables_y_tipoDatos = Stack()
-
+cuadruplo = Quadruplo()
+generaCuadruplos = Operaciones() #objeto del archivo cuadruplos y de la clase operaciones
+pilaTiposDatos = Stack()
+pilaNombres = Stack()
 
 #Variables globales
 variableActualTipo = ''
@@ -22,7 +24,7 @@ variableActualID = ''
 funcionActualTipo = ''
 funcionActualID = ''
 listaOperadores = []
-lista_NombresVariables_y_tipoDatos = []
+quads = []
 
 #reserved words from the language
 reserved = {
@@ -76,7 +78,7 @@ t_LT = r'\<'
 t_GTE = r'\=>'
 t_LTE = r'\<='
 t_NE = r'\<>' 
-t_AND = r'\&&'
+t_AND = r'\&'
 t_OR = r'\|'
 t_EE = r'\=='
 t_ignore = ' \t\n'
@@ -144,7 +146,7 @@ def p_inicializarProg(p):
     funcionActualTipo = 'programa'
 
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
-    tablaFunc.printFun(funcionActualID)
+    #tablaFunc.printFun(funcionActualID)
 
 # aux del prog para evitar ambiguedades
 def p_prog_1(p):
@@ -168,7 +170,7 @@ def p_agregarMain(p):
 
     #type, fid, numberParams, paramType, paramsID, numberVars
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
-    tablaFunc.printFun(funcionActualID)
+    #tablaFunc.printFun(funcionActualID)
 
 def p_estatutos(p):
     '''
@@ -219,21 +221,50 @@ def p_guardarOp(p):
 
     operador = p[-1]
     listaOperadores.append(operador)
-    print(listaOperadores[-1])
+    #print(listaOperadores[-1])
 
 
 def p_expresion(p):
     '''
     expresion : expAux
-        | expAux OR guardarOp expAux
+        | expAux OR guardarOp expAux cuadruploOR
     ''' 
+
+def p_cuadruploOR(p):
+    '''
+    cuadruploOR : 
+    '''
+    global nombresVariables_y_tipoDatos
+    global listaOperadores
+    global generaCuadruplos
+
+
+    if len(listaOperadores) > 0:
+        if(listaOperadores[-1] == '|'):
+            generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
 
 
 def p_expAux(p):
     '''
     expAux : eAux
-         | eAux AND guardarOp eAux
+         | eAux AND guardarOp eAux cuadruploAND
     ''' 
+
+
+def p_cuadruploAND(p):
+    ''' 
+    cuadruploAND : 
+    '''
+
+    global listaOperadores
+    global nombresVariables_y_tipoDatos
+    global cuadruplo
+
+    if len(listaOperadores) > 0:
+        if(listaOperadores[-1] == '&'):
+            generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
+
+
 
 def p_eAux(p):
     '''
@@ -243,12 +274,27 @@ def p_eAux(p):
 
 def p_eAux2(p):
     '''
-    eAux2 : masMen GT guardarOp masMen
-        | masMen LT guardarOp masMen
-        | masMen GTE guardarOp masMen
-        | masMen LTE guardarOp masMen
-        | masMen NE guardarOp masMen 
+    eAux2 : masMen GT guardarOp masMen cuadruplosLOGICOS
+        | masMen LT guardarOp masMen cuadruplosLOGICOS
+        | masMen GTE guardarOp masMen cuadruplosLOGICOS
+        | masMen LTE guardarOp masMen cuadruplosLOGICOS
+        | masMen NE guardarOp masMen cuadruplosLOGICOS
     ''' 
+
+
+def p_cuadruplosLOGICOS(p):
+    ''' 
+    cuadruplosLOGICOS : 
+    '''
+
+    global listaOperadores
+    global nombresVariables_y_tipoDatos
+    global cuadruplo
+
+    if(len(listaOperadores) > 0):
+        if(listaOperadores[-1] == '>' or listaOperadores[-1] == '<'  or listaOperadores[-1] == '=>' or listaOperadores[-1] == '<=' or listaOperadores[-1] == '<>' or listaOperadores[-1] == '=='):
+            generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
+
 
 def p_masMen(p):
     '''
@@ -256,12 +302,42 @@ def p_masMen(p):
            | mulDiv PLUS guardarOp mulDiv
            | mulDiv MINUS guardarOp mulDiv
     '''
+
+def p_cuadruplosMASMENOS(p):
+    '''
+    cuadruplosMASMENOS : 
+    '''
+
+    global listaOperadores
+    global nombresVariables_y_tipoDatos
+    global cuadruplo
+
+    if(len(listaOperadores) > 0):
+        if(listaOperadores[-1] == '+' or listaOperadores[-1] == '-'):
+            generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
+
+
 def p_mulDiv(p):
     '''
     mulDiv : expNum
            | expNum MUL guardarOp expNum
            | expNum DIV guardarOp expNum
     '''
+
+def p_cuadruplosMULDIV(p):
+    '''
+    cuadruplosMULDIV : 
+    '''
+
+    global listaOperadores
+    global nombresVariables_y_tipoDatos
+    global cuadruplo
+
+    if(len(listaOperadores) > 0):
+        if(listaOperadores[-1] == '*' or listaOperadores[-1] == '/'):
+            generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
+
+
 def p_expNum(p):
     '''
     expNum : CTEI
@@ -290,6 +366,17 @@ def p_escritura(p):
     escritura : PRINT LPAREN escrituraAux RPAREN SEMICOLON
     '''
 
+def p_operadorPrint(p):
+    '''
+    operadorPrint : 
+    '''
+
+    global listaOperadores
+    
+    if(len(listaOperadores) > 0):
+        listaOperadores.append('print')
+
+
 def p_escrituraAux(p):
     '''
     escrituraAux : ID
@@ -316,8 +403,38 @@ def p_lecturaAux2(p):
 
 def p_asignacion(p):
     '''
-    asignacion : ID EQUALS expresion
+    asignacion : ID EQUALS guardarOp expresion asignaValoraCuad
     '''
+
+def p_asignaValoraCuad(p):
+    '''
+    asignaValoraCuad : 
+    '''
+    global pilaTiposDatos
+    global pilaNombres
+    global listaOperadores
+    global quads
+    
+    if(len(listaOperadores) > 0):
+        op = listaOperadores.pop()
+
+        opDerID = pilaNombres.pop()
+        opDerType = pilaTiposDatos.pop()
+
+        opIzqID = pilaNombres.pop()
+        opIzqType = pilaTiposDatos.pop()
+
+        resType = getType(opIzqType,opDerType,op)
+
+        if resType != 'ERROR':
+            quad = (op, opDerID, None, opIzqID)
+            print('Cuadruplo:', str(quad))
+            quads.append(quad)
+            
+        else: 
+            print('Type Dissmatch....')
+            sys.exit()
+
 
 def p_llamadaFun(p): 
     '''
@@ -356,6 +473,14 @@ def p_addVariable(p):
 
     tablaFunc.agregarVariable(funcionActualID , variableActualTipo, variableActualID)
     #tablaFunc.printFun(funcionActualID)
+    
+    pilaTiposDatos.push(variableActualTipo)
+    print(pilaTiposDatos.peek() )
+
+
+    pilaNombres.push(variableActualID)
+    print(pilaNombres.peek() )
+
     nom_y_tipo = nombreTipo(variableActualTipo, variableActualID)
     nombresVariables_y_tipoDatos.push(nom_y_tipo)
     #print( nombresVariables_y_tipoDatos.peek().identificador )
