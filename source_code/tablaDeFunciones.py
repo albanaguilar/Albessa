@@ -10,13 +10,13 @@ class tablaFunc():
     def agregarFuncion(self, type, functionName, numberParams, paramType, vars, numberVars):
         if functionName not in self.functions.keys(): #params to save in the table
             self.functions[functionName] = {
-                'type' : type, 'numberParams' : numberParams,
+                'type' : type, 'functionName' : functionName, 'numberParams' : numberParams,
                 'paramType' : paramType, 'vars' : vars, 
                 'variables' : tablaVar(), #it is done separatly, too many vars
                 'numberVars' : numberVars }
             print('Funcion añadida:',functionName, ' ', type)
-        else:
-            print(id , 'ya existe')
+        #else:
+            #print(id , 'ya existe')
 
     def buscarFun(self, id):
         return id in self.functions 
@@ -45,16 +45,3 @@ class tablaFunc():
 #funcion.agregarFuncion("void", "factores", 2, ["int", "float"], ["a", "b"], 2)
 #print(funcion.buscarFun("factores"))
 #funcion.printFun("factores")
-
-
-
-
-
-
-
-
-
-
-
-
-

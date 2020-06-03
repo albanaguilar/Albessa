@@ -16,7 +16,6 @@ class Quadruplo:
         self.quadruplo = []
         self.contador = 0
 
-	# añade cuadruplos a un objeto
     def addQ(self, left, right, op, result):
         q = {left, right, op, result}
         self.quadruplo.append(q)
@@ -39,7 +38,7 @@ class Operaciones:
         return getType(opIzq, opDer, operator)
 
     # se genera el cuadruplo
-    def operations(self, operators: Stack, opNombreTipo: Stack, quadruplo: Quadruplo):
+    def operations(self, operators, opNombreTipo, quadruplo):
         global avail 
         global tvar 
         global ntvar
@@ -60,7 +59,7 @@ class Operaciones:
             
             #si no es error agrega el cuadruplo
             quadruplo.addQ(operandoIzquierdo, operandoDerecho ,operador , result)
-        	
+            
 
             #hace push con el nombre de variabel y tipo de dato al stack
             opNombreTipo.push(result)
@@ -86,6 +85,3 @@ class Operaciones:
 # z.push('+')
 
 # print('HOLAAAAAAAA', s.pop().type, s.pop().type, z.pop())
-
-
-

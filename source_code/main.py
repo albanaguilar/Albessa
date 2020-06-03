@@ -1,12 +1,12 @@
-import sys
 import ply.lex as lex
 import ply.yacc as yacc
 from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
 from nombreTipo import nombreTipo
-from cuboSemantico import *
-from quadruplos import Quadruplo, Operaciones
+from cuboSemantico import getType
+from quadruplos import *
 from stack import Stack
+import sys
 
 # Objetos
 tablaFunc = tablaFunc()
@@ -16,6 +16,8 @@ cuadruplo = Quadruplo()
 generaCuadruplos = Operaciones() #objeto del archivo cuadruplos y de la clase operaciones
 pilaTiposDatos = Stack()
 pilaNombres = Stack()
+pilaSaltosCondicionales = Stack()
+pilaDeOperandos = Stack()
 
 #Variables globales
 variableActualTipo = ''
@@ -25,6 +27,9 @@ funcionActualTipo = ''
 funcionActualID = ''
 listaOperadores = []
 quads = []
+listaAUX = []
+listaNombres = []
+
 
 #reserved words from the language
 reserved = {
@@ -108,7 +113,7 @@ def t_CTEF(t):
     t.value = float(t.value)
     return t
 
-#tokens de strings
+# string tokens
 def t_CTESTRING(t):
     r'\'[\w\d\s\,. ]*\'|\"[\w\d\s\,. ]*\"'
     return t
@@ -119,8 +124,6 @@ def t_error(t):
     t.lexer.skip(1) 
 
 lexer = lex.lex()
-
-lexer.input("ab3 = 'a'")
 
 # parser
 #reglas en minuscula
@@ -186,24 +189,126 @@ def p_estatutos(p):
 
 def p_for(p):
     '''
-    for : FOR asignacion TO CTEI LCURLY estatutos RCURLY
+    for : FOR asignacion TO CTEI cuadruploFOR LCURLY estatutos RCURLY 
     '''
+
+def p_cuadruploFOR(p):
+    '''
+    cuadruploFOR : 
+    '''
+
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+    global pilaSaltosCondicionales
+
+    resultadoType = pilaTiposDatos.pop()
+
+    if resultadoType == 'float' or resultadoType == 'int':
+        val = pilaNombres.pop()
+        qua = ('GotoV', val, None, -1)
+
+        print('quad:', str(qua))
+        quads.append(qua)
+        pilaSaltosCondicionales.push( len(quads) - 1 )
+    else: 
+        print('error en el for')
+        sys.exit()
+
 
 def p_while(p):
     '''
-    while : WHILE LPAREN expresion RPAREN LCURLY estatutos RCURLY
+    while : WHILE operadorWHILE LPAREN expresion RPAREN cuadruploWHILE LCURLY estatutos RCURLY
     '''
+
+def p_operadorWHILE(p):
+    ''' 
+    operadorWHILE : 
+    '''
+
+    global listaOperadores
+    global pilaSaltosCondicionales
+
+    listaOperadores.append('while')
+    pilaSaltosCondicionales.push(len(quads))
+
+def p_cuadruploWHILE(p):
+    '''
+    cuadruploWHILE : 
+    '''
+
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+    global pilaSaltosCondicionales
+
+    #print("ENTRO AL WHILE SIN ERROR")
+    resultadoType = 'bool'
+    #print(resultadoType)
+
+    if resultadoType == 'bool':
+        #print("COMPARACION BOOL")
+        val = pilaNombres.pop()
+        qua = ('GotoF', val, None, -1)
+        print('quad:', str(qua))
+        quads.append(qua)
+        pilaSaltosCondicionales.push( len(quads) - 1 )
+
+    else: 
+        print('error en le while')
+        sys.exit()
+
 
 def p_if(p):
     '''
-    if : IF LPAREN expresion RPAREN THEN LCURLY estatutos RCURLY else
+    if : IF LPAREN expresion RPAREN cuadruploIF THEN LCURLY estatutos RCURLY else
     '''
+
+def p_cuadruploIF(p):
+    '''
+    cuadruploIF : 
+    '''
+
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+    global pilaSaltosCondicionales
+
+    resultadoType = 'bool'
+    if resultadoType == 'bool':
+        val = pilaNombres.pop()
+        qua = ('GotoF', val, None, -1)
+        
+        quads.append(qua)
+        
+        pilaSaltosCondicionales.push( len(quads) -1)
+    else: 
+        print('error en el if')
+        sys.exit()
+
 
 def p_else(p):
     '''
-    else : ELSE LCURLY estatutos RCURLY
+    else : ELSE cuadruploELSE LCURLY estatutos RCURLY
         | empty
     '''
+
+def p_cuadruploELSE(p):
+    '''
+    cuadruploELSE : 
+    '''
+
+    global quads
+    global pilaSaltosCondicionales
+
+
+    aux = ('Goto', None, None, -1)
+    quads.append(aux)
+
+    otroAux = pilaSaltosCondicionales.pop()
+    pilaSaltosCondicionales.push(len(quads)-1)
+    #llenar_quad(otroAux, -1)
+    # print('quad:', str(quad))
 
 def p_return(p):
     '''
@@ -226,9 +331,85 @@ def p_guardarOp(p):
 
 def p_expresion(p):
     '''
-    expresion : expAux
-        | expAux OR guardarOp expAux cuadruploOR
-    ''' 
+    expresion : cAnd cuadruploOR expAux
+    '''
+
+
+def p_expAux(p):
+    '''
+    expAux : OR guardarOp expresion
+        | empty
+    '''
+
+
+def p_cAnd(p):
+    '''
+    cAnd : logicos cuadruploAND cAnd1
+    '''
+
+
+def p_cAnd1(p):
+    '''
+    cAnd1 : AND guardarOp cAnd
+        | empty
+    '''
+
+
+def p_logicos(p):
+    '''
+    logicos : opAritm cuadruplosLOGICOS opLogicos cuadruplosLOGICOS
+    '''
+
+
+def p_opLogicos(p):
+    '''
+    opLogicos : GT guardarOp opAritm
+        | LT guardarOp opAritm
+        | GTE guardarOp opAritm
+        | LTE guardarOp opAritm
+        | NE guardarOp opAritm
+        | EE guardarOp opAritm
+        | empty
+    '''
+
+
+def p_opAritm(p):
+    '''
+    opAritm : mulDivAritmeticos cuadruplosMASMENOS opAritm1
+    '''
+
+
+def p_opAritm1(p):
+    '''
+    opAritm1 : PLUS guardarOp opAritm
+        | MINUS guardarOp opAritm
+        | empty
+    '''
+
+
+def p_mulDivAritmeticos(p):
+    '''
+    mulDivAritmeticos : num cuadruplosMULDIV mulDivAritmeticos1
+    '''
+
+
+def p_mulDivAritmeticos1(p):
+    '''
+    mulDivAritmeticos1 : MUL guardarOp mulDivAritmeticos
+        | DIV guardarOp mulDivAritmeticos
+        | empty
+    '''
+
+
+def p_num(p):
+    '''
+    num : CTEI
+        | CTEF
+        | CTEC
+        | llamadaFun
+        | ID
+        | LPAREN expresion RPAREN
+    '''
 
 def p_cuadruploOR(p):
     '''
@@ -242,13 +423,6 @@ def p_cuadruploOR(p):
     if len(listaOperadores) > 0:
         if(listaOperadores[-1] == '|'):
             generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
-
-
-def p_expAux(p):
-    '''
-    expAux : eAux
-         | eAux AND guardarOp eAux cuadruploAND
-    ''' 
 
 
 def p_cuadruploAND(p):
@@ -265,23 +439,6 @@ def p_cuadruploAND(p):
             generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
 
 
-
-def p_eAux(p):
-    '''
-    eAux : masMen 
-        | eAux2 masMen
-    ''' 
-
-def p_eAux2(p):
-    '''
-    eAux2 : masMen GT guardarOp masMen cuadruplosLOGICOS
-        | masMen LT guardarOp masMen cuadruplosLOGICOS
-        | masMen GTE guardarOp masMen cuadruplosLOGICOS
-        | masMen LTE guardarOp masMen cuadruplosLOGICOS
-        | masMen NE guardarOp masMen cuadruplosLOGICOS
-    ''' 
-
-
 def p_cuadruplosLOGICOS(p):
     ''' 
     cuadruplosLOGICOS : 
@@ -295,13 +452,6 @@ def p_cuadruplosLOGICOS(p):
         if(listaOperadores[-1] == '>' or listaOperadores[-1] == '<'  or listaOperadores[-1] == '=>' or listaOperadores[-1] == '<=' or listaOperadores[-1] == '<>' or listaOperadores[-1] == '=='):
             generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
 
-
-def p_masMen(p):
-    '''
-    masMen : mulDiv
-           | mulDiv PLUS guardarOp mulDiv
-           | mulDiv MINUS guardarOp mulDiv
-    '''
 
 def p_cuadruplosMASMENOS(p):
     '''
@@ -317,13 +467,6 @@ def p_cuadruplosMASMENOS(p):
             generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
 
 
-def p_mulDiv(p):
-    '''
-    mulDiv : expNum
-           | expNum MUL guardarOp expNum
-           | expNum DIV guardarOp expNum
-    '''
-
 def p_cuadruplosMULDIV(p):
     '''
     cuadruplosMULDIV : 
@@ -338,17 +481,6 @@ def p_cuadruplosMULDIV(p):
             generaCuadruplos.operations(listaOperadores, nombresVariables_y_tipoDatos, cuadruplo)
 
 
-def p_expNum(p):
-    '''
-    expNum : CTEI
-         | CTEF
-         | CTEC
-         | llamadaFun
-         | ID
-         | LPAREN expresion RPAREN
-    '''
-
-
 def p_arreglos(p):
     '''
     arreglos : type ID LBRACKET CTEI RBRACKET arrAux SEMICOLON 
@@ -360,10 +492,39 @@ def p_arrAux(p):
         | empty
     '''
 
+def p_cuadruploPRINT(p):
+    '''
+    cuadruploPRINT : 
+    '''
+
+    global listaOperadores
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+
+    # print("LONGITUD LISTA DE operadores")
+    # print( len(listaOperadores))
+    
+    if ( len(listaOperadores) > 0):
+        if listaOperadores[-1] == "print":
+            operator_aux = listaOperadores.pop()
+            #print("****************")
+            #print( pilaNombres.pop() )
+
+            val = pilaNombres.pop()
+            pilaTiposDatos.pop()
+            qua = (operator_aux, None, None, val)
+            print('Cuadruplo:', str(qua))
+            quads.append(qua)
+
 
 def p_escritura(p):
     '''
-    escritura : PRINT LPAREN escrituraAux RPAREN SEMICOLON
+    escritura : PRINT LPAREN escrituraAUX RPAREN SEMICOLON
+    '''
+def p_escrituraAUX(p):
+    '''
+    escrituraAUX : operadorPrint expresion cuadruploPRINT
     '''
 
 def p_operadorPrint(p):
@@ -372,23 +533,28 @@ def p_operadorPrint(p):
     '''
 
     global listaOperadores
-    
+
     if(len(listaOperadores) > 0):
         listaOperadores.append('print')
-
-
-def p_escrituraAux(p):
-    '''
-    escrituraAux : ID
-        | COMILLA CTESTRING COMILLA
-        | COMILLA CTESTRING COMILLA COMMA ID
-    '''
+        #print("*** LISTA DE OPERADOR PRINT ***")
+        #print(listaOperadores[-1])
+       # print("*** cierre DE OPERADOR PRINT ***")
 
 
 def p_lectura(p):
     '''
-    lectura : READ LPAREN lecturaAux RPAREN SEMICOLON
+    lectura : READ LPAREN lecturaAux RPAREN SEMICOLON operadorRead
     ''' 
+
+def p_operadorRead(p):
+    ''' 
+    operadorRead : 
+    '''
+
+    global listaOperadores
+
+    listaOperadores.append('read')
+
 
 def p_lecturaAux(p):
     '''
@@ -423,10 +589,17 @@ def p_asignaValoraCuad(p):
 
         opIzqID = pilaNombres.pop()
         opIzqType = pilaTiposDatos.pop()
+        # print("_____________________________")
+        # print(opIzqType)
+        # print(opDerType)
+        # print(op)
+        # print("_____________________________")
+        resultadoType = getType(opIzqType,opDerType,op)
+        # print(resultadoType)
+        #print("TROLOLOLOLOLO")
+        #print(resultadoType)
 
-        resType = getType(opIzqType,opDerType,op)
-
-        if resType != 'ERROR':
+        if resultadoType != 'ERROR':
             quad = (op, opDerID, None, opIzqID)
             print('Cuadruplo:', str(quad))
             quads.append(quad)
@@ -467,7 +640,10 @@ def p_addVariable(p):
     addVariable : 
     '''
 
-    global funcionActualID, variableActualTipo,funcionActualTipo
+    global funcionActualID
+    global variableActualTipo
+    global funcionActualTipo
+    global pilaNombres
 
     variableActualID = p[-1]
 
@@ -475,17 +651,21 @@ def p_addVariable(p):
     #tablaFunc.printFun(funcionActualID)
     
     pilaTiposDatos.push(variableActualTipo)
-    print(pilaTiposDatos.peek() )
+    #print(pilaTiposDatos.peek() )
 
-
+    #print("///////PARA VER SI LO GUARDA EN UNA LISTAAAA//////////")
     pilaNombres.push(variableActualID)
-    print(pilaNombres.peek() )
+    #listaNombres.append(variableActualID)
+    #print(listaNombres[-1])
+    #print(pilaNombres.pop() )
 
     nom_y_tipo = nombreTipo(variableActualTipo, variableActualID)
     nombresVariables_y_tipoDatos.push(nom_y_tipo)
     #print( nombresVariables_y_tipoDatos.peek().identificador )
     #print( nombresVariables_y_tipoDatos.peek().type )
 
+    #print(pilaNombres.pop())
+    #print("///////////////////")
 
 # para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
 def p_var2(p):
@@ -539,7 +719,6 @@ def p_agregarFuncion(p):
         funcionActualTipo = 'void'
     
 
-    #type, fid, numberParams, paramType, paramsID, numberVars
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
 
 
@@ -564,6 +743,24 @@ def p_empty(p):
     '''
     empty : 
     '''
+
+#################################################
+##################################
+############### CAMBIARRRRRRRR##################
+#Se llenan los cuadruplos, se le pasa el end de un ciclo
+# o un condicional y un contador
+def llenaCuadruplo(end, cont):
+
+    global quads, quadruplesMem
+
+    t = list(quads[end])
+    t[3] = len(quads)
+    quads[end] = tuple(t) # se le esta asignando la lista, de la posicion end 
+    t = list(quadruplesMem[end])
+    t[3] = len(quadruplesMem) # se esta asignando memoria
+    quadruplesMem[end] = tuple(t)
+
+
 
 parser = yacc.yacc()
 

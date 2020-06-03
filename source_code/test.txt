@@ -6,25 +6,33 @@ char doo;
 
 funcion int factores (int i, float po)
 var int j;
+float r;
 {
-	if (10) then{
-		print(a);
-	}
-	else{
-		i = 3;
+	r = 98;
+	while( 4 < 10 ){
+		o = polo + 4;
 	}
 
+	print(s);
 	j = 2 + 2 * 4;
 	return j * 2;
 
 }
 
-funcion void factores2 ()
+funcion void bomboncito ()
 var float po, lo, io;
 int arreglo[4];
 {
 	for p = 0 to 9{
 		read (p, a, b);
+	}
+
+
+	if (10 < 20) then{
+		print(a);
+	}
+	else{
+		i = 3;
 	}
 	
 }
