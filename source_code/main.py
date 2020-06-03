@@ -744,24 +744,6 @@ def p_empty(p):
     empty : 
     '''
 
-#################################################
-##################################
-############### CAMBIARRRRRRRR##################
-#Se llenan los cuadruplos, se le pasa el end de un ciclo
-# o un condicional y un contador
-def llenaCuadruplo(end, cont):
-
-    global quads, quadruplesMem
-
-    t = list(quads[end])
-    t[3] = len(quads)
-    quads[end] = tuple(t) # se le esta asignando la lista, de la posicion end 
-    t = list(quadruplesMem[end])
-    t[3] = len(quadruplesMem) # se esta asignando memoria
-    quadruplesMem[end] = tuple(t)
-
-
-
 parser = yacc.yacc()
 
 
