@@ -1,5 +1,4 @@
 program foreverAlone;
-
 var int i,j,k;
 float po;
 char doo;
@@ -18,7 +17,6 @@ float r;
 	return j * 2;
 
 }
-
 funcion void bomboncito ()
 var float po, lo, io;
 int arreglo[4];
@@ -39,6 +37,5 @@ int arreglo[4];
 
 main (){
 	j = 4;
-	print(j);
-}
+	print(j);}
 end

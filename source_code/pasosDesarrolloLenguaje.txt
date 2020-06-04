@@ -1,7 +1,0 @@
-PASO 1.-
-	Analisis de lexico y sintaxis (Parser y Lexxer)
-		Utilice Lexx y Yacc en Python
-
-PASO 2.-
-	Semantica basica de variables: Directorio de procedimientos y tabla de variables
-		Se hizo una tabla de variables y una tabla de funciones
