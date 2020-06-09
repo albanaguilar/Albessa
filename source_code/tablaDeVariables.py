@@ -7,9 +7,11 @@ class tablaVar:
         
 
     # function to add var to var table
-    def agregar(self, type, id): 
-        self. listaVariables[id ] = {
-            'type': type }
+    def agregar(self, type, id, direccion): 
+        self. listaVariables[id] = {
+            'type': type,
+            'direccion': direccion
+        }
 
 
     def buscarVar(self, id):

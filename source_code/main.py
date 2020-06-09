@@ -4,6 +4,7 @@ from tablaDeFunciones import tablaFunc
 from tablaDeVariables import tablaVar
 from nombreTipo import nombreTipo
 from cuboSemantico import getType
+from memoria import Memoria
 from quadruplos import *
 from stack import Stack
 import sys
@@ -136,6 +137,7 @@ def p_prog(p):
     '''
     p[0] = 'PROGRAMA COMPILADO'
 
+
 #considera -1 al ID, inicializarProg es el indice 0
 def p_inicializarProg(p):
     '''
@@ -146,7 +148,7 @@ def p_inicializarProg(p):
     global funcionActualID, funcionActualTipo
     #print(p[-2])
     funcionActualID = p[-1]
-    funcionActualTipo = 'programa'
+    funcionActualTipo = 'program'
 
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
     #tablaFunc.printFun(funcionActualID)
@@ -162,6 +164,7 @@ def p_main_1(p):
     '''
     main_1 : MAIN agregarMain LPAREN RPAREN LCURLY estatutos RCURLY
     '''
+
 
 def p_agregarMain(p):
     '''
@@ -189,8 +192,23 @@ def p_estatutos(p):
 
 def p_for(p):
     '''
-    for : FOR asignacion TO CTEI cuadruploFOR LCURLY estatutos RCURLY 
+    for : FOR operadorFOR asignacion TO CTEI cuadruploFOR LCURLY estatutos RCURLY finCICLO
     '''
+
+def p_operadorFOR(p):
+    '''
+    operadorFOR : 
+    '''
+
+    global listaOperadores
+    global quads
+    global pilaSaltosCondicionales
+
+
+    #print("OPERADOR FOR ")
+    listaOperadores.append("for")
+    #print( listaOperadores[-1] )
+    pilaSaltosCondicionales.push( len(quads) )
 
 def p_cuadruploFOR(p):
     '''
@@ -206,6 +224,7 @@ def p_cuadruploFOR(p):
 
     if resultadoType == 'float' or resultadoType == 'int':
         val = pilaNombres.pop()
+        
         qua = ('GotoV', val, None, -1)
 
         print('quad:', str(qua))
@@ -216,9 +235,27 @@ def p_cuadruploFOR(p):
         sys.exit()
 
 
+def p_finCICLO(p):
+    '''
+    finCICLO : 
+    '''
+
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+    global pilaSaltosCondicionales
+
+    end = pilaSaltosCondicionales.pop()
+    retroceso = pilaSaltosCondicionales.pop()
+    quad = ('Goto', None, None, retroceso)
+    quads.append(quad)
+    llenarCuadruplo(end, -1)
+    print('quad:', str(quad))
+
+
 def p_while(p):
     '''
-    while : WHILE operadorWHILE LPAREN expresion RPAREN cuadruploWHILE LCURLY estatutos RCURLY
+    while : WHILE operadorWHILE LPAREN expresion RPAREN cuadruploWHILE LCURLY estatutos RCURLY finCICLO
     '''
 
 def p_operadorWHILE(p):
@@ -259,9 +296,20 @@ def p_cuadruploWHILE(p):
         sys.exit()
 
 
+def p_terminoIF(p):
+    '''
+    terminoIF : 
+    '''
+    global pilaSaltosCondicionales
+
+    end = pilaSaltosCondicionales.pop()
+    # print("el end que debe guardar en F:", end, '\n')
+    llenarCuadruplo(end, -1)
+
+
 def p_if(p):
     '''
-    if : IF LPAREN expresion RPAREN cuadruploIF THEN LCURLY estatutos RCURLY else
+    if : IF LPAREN expresion RPAREN cuadruploIF THEN LCURLY estatutos RCURLY else terminoIF
     '''
 
 def p_cuadruploIF(p):
@@ -287,6 +335,18 @@ def p_cuadruploIF(p):
         sys.exit()
 
 
+def llenarCuadruplo(end, cont):
+    '''
+    llenarCuadruplo : 
+    '''
+    global quads
+
+    varTemp = list(quads[end])
+    varTemp[3] = len(quads)
+    quads[end] = tuple(varTemp)
+    print('quad', quads[end])
+
+
 def p_else(p):
     '''
     else : ELSE cuadruploELSE LCURLY estatutos RCURLY
@@ -310,11 +370,44 @@ def p_cuadruploELSE(p):
     #llenar_quad(otroAux, -1)
     # print('quad:', str(quad))
 
+
 def p_return(p):
     '''
-    return : RETURN expresion SEMICOLON
+    return : RETURN operadorRETURN cuadruploRETURN expresion SEMICOLON
     '''
 
+def p_operadorRETURN(p):
+    '''
+    operadorRETURN : 
+    '''
+
+    global listaOperadores
+
+    listaOperadores.append('return')
+
+
+def p_cuadruploRETURN(p):
+    '''
+    cuadruploRETURN : 
+    '''
+
+    global quads
+    global pilaNombres
+    global listaOperadores
+    global actual_funTipo
+
+    if len(listaOperadores) > 0:
+        if listaOperadores[-1] == 'return':
+            aux = listaOperadores.pop()
+            result = pilaNombres.pop()
+
+            qua = (aux, -1, -1, result)
+            # print('QUAD RETURN:', str(quad))
+            quads.append(qua)
+            
+        else: 
+            print('Type dissmatch')
+            sys.exit()
 
 #Regla para guardar en una pila los operadores usados
 def p_guardarOp(p):
@@ -520,11 +613,11 @@ def p_cuadruploPRINT(p):
 
 def p_escritura(p):
     '''
-    escritura : PRINT LPAREN escrituraAUX RPAREN SEMICOLON
+    escritura : PRINT operadorPrint LPAREN escrituraAUX cuadruploPRINT RPAREN SEMICOLON
     '''
 def p_escrituraAUX(p):
     '''
-    escrituraAUX : operadorPrint expresion cuadruploPRINT
+    escrituraAUX : expresion
     '''
 
 def p_operadorPrint(p):
@@ -543,7 +636,7 @@ def p_operadorPrint(p):
 
 def p_lectura(p):
     '''
-    lectura : READ LPAREN lecturaAux RPAREN SEMICOLON operadorRead
+    lectura : READ operadorRead LPAREN lecturaAux RPAREN SEMICOLON cuadruploREAD
     ''' 
 
 def p_operadorRead(p):
@@ -567,6 +660,31 @@ def p_lecturaAux2(p):
         | empty
     '''
 
+def p_cuadruploREAD(p):
+    '''
+    cuadruploREAD : 
+    '''
+
+    global listaOperadores
+    global pilaNombres
+    global pilaTiposDatos
+    global quads
+
+    print("ENTRO AL READDD")
+    print(listaOperadores[-1])
+    if(len(listaOperadores) > 0):
+        if listaOperadores[-1] == 'read':
+            aux = listaOperadores.pop()
+            print("************************************************")
+            print(aux)
+            val = pilaNombres.pop()
+            pilaTiposDatos.pop()
+            qua = (aux, None, None, val)
+            print('Quadruplo de read:', str(qua))
+            quads.append(qua)
+            print("************************************************")
+
+
 def p_asignacion(p):
     '''
     asignacion : ID EQUALS guardarOp expresion asignaValoraCuad
@@ -582,6 +700,7 @@ def p_asignaValoraCuad(p):
     global quads
     
     if(len(listaOperadores) > 0):
+        opAux = tablaFunc.getMemoriaDeOperadores( listaOperadores[-1] )
         op = listaOperadores.pop()
 
         opDerID = pilaNombres.pop()
@@ -634,6 +753,14 @@ def p_varMulti(p):
         | empty
     '''
 
+
+# para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
+def p_var2(p):
+    '''
+    var2 : var1
+        | empty
+    '''
+
 #se agregan las variables, sus nombres y tipos a la tabla de funciones 
 def p_addVariable(p):
     '''
@@ -641,11 +768,19 @@ def p_addVariable(p):
     '''
 
     global funcionActualID
+    global tablaFunc
     global variableActualTipo
     global funcionActualTipo
     global pilaNombres
 
     variableActualID = p[-1]
+    print("la variable es ", variableActualID)
+    # if variableActualID != None:
+    #     if tablaFunc.buscarFun(funcionActualID):
+    #         tablaFunc.agregarVariable(funcionActualID , variableActualTipo, variableActualID)
+    #     else:
+    #         sys.exit()
+            
 
     tablaFunc.agregarVariable(funcionActualID , variableActualTipo, variableActualID)
     #tablaFunc.printFun(funcionActualID)
@@ -659,20 +794,13 @@ def p_addVariable(p):
     #print(listaNombres[-1])
     #print(pilaNombres.pop() )
 
-    nom_y_tipo = nombreTipo(variableActualTipo, variableActualID)
-    nombresVariables_y_tipoDatos.push(nom_y_tipo)
+    #nom_y_tipo = nombreTipo(variableActualTipo, variableActualID)
+    #nombresVariables_y_tipoDatos.push(nom_y_tipo)
     #print( nombresVariables_y_tipoDatos.peek().identificador )
     #print( nombresVariables_y_tipoDatos.peek().type )
 
     #print(pilaNombres.pop())
     #print("///////////////////")
-
-# para agregar mas de un tipo de variablea; solo puede ser empty la segunda que entra
-def p_var2(p):
-    '''
-    var2 : var1
-        | empty
-    '''
 
 def p_type(p):
     '''
@@ -687,7 +815,9 @@ def p_regresaTipoVar(p):
     '''
 
     global variableActualTipo
+
     variableActualTipo = p[-2]
+
 
 def p_returnTipo(p):
     '''
@@ -700,10 +830,21 @@ def p_returnTipo(p):
 
 def p_methods(p):
     '''
-    methods : FUNCION VOID ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods
-        | FUNCION type ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods
+    methods : FUNCION VOID ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods end_func
+        | FUNCION type ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods end_func
         | empty
     '''
+
+def p_end_func(p):
+    '''
+    end_func : 
+    '''
+
+    global quads
+    global tablaFunc
+
+    qua = ('ENDFUNC', None, None, -1)
+    quads.append(qua)
 
 
 #puntos neuralgicos

@@ -1,5 +1,5 @@
 program foreverAlone;
-var int i,j,k;
+var int i , j , k;
 float po;
 char doo;
 
