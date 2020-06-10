@@ -46,6 +46,7 @@ class Memoria:
                     # la misma direccion a dos datos
                     direccion = self.intsGlobales
                     self.intsGlobales += 1
+                    return direccion
                 else:
                     print("fuera de rango")
                     
@@ -53,6 +54,7 @@ class Memoria:
                 if self.floatsGlobales >= 501 and self.floatsGlobales <= 1500:
                     direccion = self.floatsGlobales
                     self.floatsGlobales += 1
+                    return direccion
                 else:
                     print("fuera de rango")
 
@@ -60,6 +62,7 @@ class Memoria:
                 if self.charsGlobales > 1500 and self.charsGlobales <= 2500:
                     direccion = self.charsGlobales
                     self.charsGlobales += 1
+                    return direccion
                 else:
                     print("fuera de rango")
 
@@ -67,6 +70,7 @@ class Memoria:
                 if self.boolsGlobales >= 2501 and self.boolsGlobales <= 3500: # 2501 a 3500
                     direccion = self.boolsGlobales
                     self.boolsGlobales += 1
+                    return direccion
 
     ########################################################################
     ######### LOCALES #############################################

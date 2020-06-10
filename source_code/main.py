@@ -192,7 +192,7 @@ def p_estatutos(p):
 
 def p_for(p):
     '''
-    for : FOR operadorFOR asignacion TO CTEI cuadruploFOR LCURLY estatutos RCURLY finCICLO
+    for : FOR operadorFOR asignacion TO expresion cuadruploFOR LCURLY estatutos RCURLY finCICLO
     '''
 
 def p_operadorFOR(p):
@@ -326,9 +326,7 @@ def p_cuadruploIF(p):
     if resultadoType == 'bool':
         val = pilaNombres.pop()
         qua = ('GotoF', val, None, -1)
-        
         quads.append(qua)
-        
         pilaSaltosCondicionales.push( len(quads) -1)
     else: 
         print('error en el if')
@@ -341,9 +339,11 @@ def llenarCuadruplo(end, cont):
     '''
     global quads
 
-    varTemp = list(quads[end])
-    varTemp[3] = len(quads)
-    quads[end] = tuple(varTemp)
+    #creas var auxiliar de listas de quads, para llenar los goto
+    aux = list(quads[end])
+    # en la casilla 3 dice la longitud y a donde se va el programa
+    aux[3] = len(quads)
+    quads[end] = tuple(aux)
     print('quad', quads[end])
 
 
@@ -670,19 +670,19 @@ def p_cuadruploREAD(p):
     global pilaTiposDatos
     global quads
 
-    print("ENTRO AL READDD")
-    print(listaOperadores[-1])
+    #print("ENTRO AL READDD")
+    #print(listaOperadores[-1])
     if(len(listaOperadores) > 0):
         if listaOperadores[-1] == 'read':
             aux = listaOperadores.pop()
-            print("************************************************")
-            print(aux)
+            #print("************************************************")
+            #print(aux)
             val = pilaNombres.pop()
             pilaTiposDatos.pop()
             qua = (aux, None, None, val)
             print('Quadruplo de read:', str(qua))
             quads.append(qua)
-            print("************************************************")
+            #print("************************************************")
 
 
 def p_asignacion(p):
@@ -892,7 +892,6 @@ def main():
     try:
         nombreArchivo = 'test.txt'
         arch = open(nombreArchivo, 'r')
-        print("El archivo a leer es: " + nombreArchivo)
         informacion = arch.read()
         arch.close()
         lexer.input(informacion)

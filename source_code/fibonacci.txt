@@ -1,0 +1,26 @@
+program fibonacci;
+var int actual, ant1, ant2, j;
+
+funcion int fib( int n)
+{
+	ant1 = 1;
+	ant2 = 1;
+
+	if( (n == 0) | (n == 1)) then {
+		actual = 1;
+	} else{
+		for i = 2 to (i< n){
+			actual = ant1 + ant2;
+			ant2 = ant1;
+			ant1 = actual;
+		}
+	}
+	
+	return actual;
+}
+
+main (){
+	j = fib(22);
+}
+end
+

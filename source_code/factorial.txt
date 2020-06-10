@@ -1,0 +1,18 @@
+program funFactorial;
+
+funcion int factorial( int numero)
+{
+	if( n == 0 ) then{
+		return 1;
+	}else{
+		return numero * factorial( numero-1);
+	}
+	
+	return actual;
+}
+
+main (){
+	int j;
+	j = factorial(5);
+}
+end
