@@ -27,6 +27,19 @@ class tablaFunc():
             self.functions[functionName]['variables'].printVar()
 
 
+    # def buscarVarEnTabFunc(self, functionName, id):
+    #     if self.functions[id]['variables'].buscarVar(id):
+    #         return True
+    #     else: 
+    #         print(id , " no existe")
+
+    def buscarVarEnTabFunc(self, functionName, id):
+        if self.functions[functionName]['variables'].buscarVar(functionName):
+            return True
+        # else: 
+        #     print(id, " no existe")
+
+
     # function to add variable to table function
     # to associate certain variables to certain functions
 
@@ -46,8 +59,8 @@ class tablaFunc():
 
 
     # añande un espacio de memoria a una variable
-    def anadirVarMemoria(self, type, vid, funId): # SET
-        self.memory.asignaDirAVariables(type, vid, funId)    
+    def anadirVarMemoria(self, type, vid, functionName): # SET
+        self.memory.asignaDirAVariables(type, vid, functionName)    
         
     def getDirecionVariables(self, var):  # GET
         return self.memory.getDirVariables(var)
@@ -55,18 +68,18 @@ class tablaFunc():
 
     #obtiene numero de parametrod de una funcion
     def getNumParametros(self, functionName):
-        return self.funciones[functionName]['numberParams']
+        return self.functions[functionName]['numberParams']
 
     # añade parametros a la tabla de funciones
     # cuando añades param a la tabla le agregas nombre, tipo y le sumas uno al num de params
     def anadirParamsTablaFunc(self, functionName, nameVar, varTipo):
-        self.funciones[functionName]['numberParams'] = self.funciones[functionName]['numberParams'] + 1
-        self.funciones[functionName]['idParams'].append(nameVar)
-        self.funciones[functionName]['tParams'].append(varTipo)
+        self.functions[functionName]['numberParams'] = self.functions[functionName]['numberParams'] + 1
+        self.functions[functionName]['idParams'].append(nameVar)
+        self.functions[functionName]['tParams'].append(varTipo)
     
     
-    def anadirMemoriaVarTemporales(self, type, vid, funId):
-       self.memory.asignaDirTemporales(type, vid, funId)    
+    def anadirMemoriaVarTemporales(self, type, vid, functionName):
+       self.memory.asignaDirTemporales(type, vid, functionName)    
         
 
     def getMemoriaVarTemp(self, temp):
@@ -85,8 +98,14 @@ class tablaFunc():
         return self.memory.getDirOperadores(op)
             
     def imprimirVariablesDeFuncion(self, functionName):
-        if functionName in self.funciones:
-            self.funciones[functionName]['vars'].printVar()
+        if functionName in self.functions:
+            self.functions[functionName]['variables'].printVar()
+
+    def getTipodeVar(self, id, functionName):
+        if self.functions[functionName]['variables'].buscarVar(id):
+            return self.functions[functionName]['variables'].getTipoVar(id)
+        else:
+            print(id, "no existe")
 
         
 # else:

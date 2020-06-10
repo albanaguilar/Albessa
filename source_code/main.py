@@ -23,14 +23,15 @@ pilaDeOperandos = Stack()
 #Variables globales
 variableActualTipo = ''
 variableActualID = ''
-
+functionName =''
 funcionActualTipo = ''
+fid = ''
 funcionActualID = ''
 listaOperadores = []
 quads = []
 listaAUX = []
 listaNombres = []
-
+varAUX = ''
 
 #reserved words from the language
 reserved = {
@@ -496,13 +497,43 @@ def p_mulDivAritmeticos1(p):
 
 def p_num(p):
     '''
-    num : CTEI
-        | CTEF
-        | CTEC
-        | llamadaFun
-        | ID
+    num : CTEI guardaIDENTIFICADOR
+        | CTEF guardaIDENTIFICADOR
+        | CTEC guardaIDENTIFICADOR
+        | llamadaFun guardaIDENTIFICADOR
+        | ID guardaIDENTIFICADOR
         | LPAREN expresion RPAREN
     '''
+
+def p_guardaIDENTIFICADOR(p):
+    '''
+    guardaIDENTIFICADOR : 
+    '''
+    global variableActualID 
+    global tablaFunc 
+    global functionName 
+    global pilaNombres 
+    global pilaTiposDatos
+
+    varAUX = p[-1]
+    variableActualID = p[-1]
+    #print("Entro a guardaIDENTIFICADOR")
+    #print(variableActualID)
+    if variableActualID != None:
+        if tablaFunc.buscarVarEnTabFunc(functionName, variableActualID):
+            types = tablaFunc.getTipodeVar(variableActualID, functionName)
+            print(types, " tipos")
+            
+            tablaFunc.anadirVarMemoria(pilaTiposDatos, variableActualID, functionName)
+            memoria = tablaFunc.getDirecionVariables(variableActualID)
+            print(memoria, " memoria")
+       
+            if types:
+                pilaTiposDatos.push(types)
+                pilaNombres.push(memoria)
+            else:
+                sys.exit() 
+
 
 def p_cuadruploOR(p):
     '''
@@ -828,10 +859,22 @@ def p_returnTipo(p):
     funcionActualTipo = p[-1]
 
 
+def p_functionName(p):
+    '''
+    functionName : 
+    '''
+
+    global functionName
+
+    functionName = p[-2]
+    print("El nombre de la funcion es: ")
+    print(functionName)
+
+
 def p_methods(p):
     '''
-    methods : FUNCION VOID ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods end_func
-        | FUNCION type ID agregarFuncion LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods end_func
+    methods : FUNCION VOID ID agregarFuncion functionName LPAREN argumentos RPAREN var LCURLY estatutos RCURLY methods end_func
+        | FUNCION type ID agregarFuncion functionName LPAREN argumentos RPAREN var LCURLY estatutos return RCURLY methods end_func
         | empty
     '''
 
@@ -890,7 +933,7 @@ parser = yacc.yacc()
 
 def main():
     try:
-        nombreArchivo = 'test.txt'
+        nombreArchivo = 'fibonacci.txt'
         arch = open(nombreArchivo, 'r')
         informacion = arch.read()
         arch.close()

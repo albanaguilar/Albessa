@@ -15,13 +15,17 @@ class tablaVar:
 
 
     def buscarVar(self, id):
-        return id in self.listaVariables
+        return id in self.listaVariables.keys()
     
 
-    def printVar(self): #para vr si esta guardada la variable en la tabla
-        for i in self.listaVariables:
-            print( i, 'se encuentra en la tabla de variables')
+    def getTipoVar(self, id):
+        return self.listaVariables[id]["type"]
 
+
+    def printVar(self): #para vr si esta guardada la variable en la tabla
+        print(self.listaVariables.items())
+        # for i in self.listaVariables:
+        #     print( i, 'se encuentra en la tabla de variables')
 
 
 #test
