@@ -183,8 +183,6 @@ class Memoria:
                 self.charsTemporales += 1
                 print(id, " su direccion: ", direccion)
                 return direccion
-            else:
-                print("fuera de rango")
             
         elif self.boolsTemporales > 8000 and self.boolsTemporales < 8999:    #8000 a 8999             
             direccion = self.boolsTemporales
@@ -269,7 +267,3 @@ class Memoria:
             return self.temp[temp]['direccion']
         else:
             return -1
-
-
-
-

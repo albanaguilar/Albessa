@@ -5,6 +5,7 @@ from tablaDeVariables import tablaVar
 from nombreTipo import nombreTipo
 from cuboSemantico import getType
 from memoria import Memoria
+from maquinavirtual import MaquinaVirtual
 from quadruplos import *
 from stack import Stack
 import sys
@@ -19,6 +20,8 @@ pilaTiposDatos = Stack()
 pilaNombres = Stack()
 pilaSaltosCondicionales = Stack()
 pilaDeOperandos = Stack()
+listaConstantes = []
+finDeProcedimiento = Stack()
 
 #Variables globales
 variableActualTipo = ''
@@ -179,6 +182,7 @@ def p_agregarMain(p):
     tablaFunc.agregarFuncion(funcionActualTipo, funcionActualID, 0, '', '', 0)
     #tablaFunc.printFun(funcionActualID)
 
+
 def p_estatutos(p):
     '''
     estatutos : asignacion SEMICOLON estatutos
@@ -232,7 +236,6 @@ def p_cuadruploFOR(p):
         quads.append(qua)
         pilaSaltosCondicionales.push( len(quads) - 1 )
     else: 
-        print('error en el for')
         sys.exit()
 
 
@@ -397,6 +400,8 @@ def p_cuadruploRETURN(p):
     global listaOperadores
     global actual_funTipo
 
+    # print("RETURN CUAD")
+    # print(listaOperadores)
     if len(listaOperadores) > 0:
         if listaOperadores[-1] == 'return':
             aux = listaOperadores.pop()
@@ -497,11 +502,11 @@ def p_mulDivAritmeticos1(p):
 
 def p_num(p):
     '''
-    num : CTEI guardaIDENTIFICADOR
-        | CTEF guardaIDENTIFICADOR
-        | CTEC guardaIDENTIFICADOR
+    num : CTEI guardaIDENTIFICADOR almacenDeConstantes
+        | CTEF guardaIDENTIFICADOR almacenDeConstantes
+        | CTEC guardaIDENTIFICADOR almacenDeConstantes
         | llamadaFun guardaIDENTIFICADOR
-        | ID guardaIDENTIFICADOR
+        | ID guardaIDENTIFICADOR almacenDeConstantes
         | LPAREN expresion RPAREN
     '''
 
@@ -705,12 +710,13 @@ def p_cuadruploREAD(p):
     #print(listaOperadores[-1])
     if(len(listaOperadores) > 0):
         if listaOperadores[-1] == 'read':
+            opAux = tablaFunc.getMemoriaDeOperadores("read")
             aux = listaOperadores.pop()
             #print("************************************************")
             #print(aux)
             val = pilaNombres.pop()
             pilaTiposDatos.pop()
-            qua = (aux, None, None, val)
+            qua = (opAux, None, None, val)
             print('Quadruplo de read:', str(qua))
             quads.append(qua)
             #print("************************************************")
@@ -759,10 +765,46 @@ def p_asignaValoraCuad(p):
             sys.exit()
 
 
+
 def p_llamadaFun(p): 
     '''
     llamadaFun : ID LPAREN expresion RPAREN SEMICOLON
     ''' 
+
+def p_almacenDeConstantes(p):
+    '''
+    almacenDeConstantes : 
+    '''
+
+    global const
+    global direccionDeConst
+    global listaConstantes
+    global pilaNombres
+    global pilaTiposDatos
+    global auxDirCons
+
+    #print("ALMACEN DE CONSTANTES")
+    const = p[-2]
+    #print(const)
+    tipoDato = type(const)
+    
+    tablaFunc.anadirMemConstantes(const)
+    auxDirCons = tablaFunc.getMemoriaConstantes(const)
+    direccionDeConst = (const, auxDirCons)
+    
+    if not direccionDeConst in listaConstantes:
+        listaConstantes.append(direccionDeConst)
+   
+    
+    if (tipoDato == int):
+        pilaTiposDatos.push("int")
+        pilaNombres.push(auxDirCons)
+    elif (tipoDato == float):
+        pilaTiposDatos.push("float")
+        pilaNombres.push(auxDirCons)
+    else:
+        pilaTiposDatos.push("char")
+        pilaNombres.push(auxDirCons)
 
 
 def p_var(p):
@@ -888,6 +930,7 @@ def p_end_func(p):
 
     qua = ('ENDFUNC', None, None, -1)
     quads.append(qua)
+    finDeProcedimiento.push( len(quads) - 1)
 
 
 #puntos neuralgicos
@@ -928,6 +971,8 @@ def p_empty(p):
     empty : 
     '''
 
+
+
 parser = yacc.yacc()
 
 
@@ -945,6 +990,25 @@ def main():
             print(tok)
         if (parser.parse(informacion, tracking = True) == 'PROGRAMA COMPILADO'):
             print ("Correct Syntax")
+
+            # se generan los cuadruplos y se almacenan en el archivo de texto generado
+            # bajo el nombre de quads.txt
+            cuadruplos = open ('quads.txt','w')
+            for i in quads:
+                cuadruplos.write(str(i) + '\n')
+            cuadruplos.close()
+            
+            # archivo en el que se almacenan las constantes, variables y datos
+            # para luego ser usados en la maquina virtual
+            const = open("const.txt", 'w')
+            for i in listaConstantes:
+                const.write(str(i) + '\n')
+            const.close()  
+
+            # se arranca la maquina virtual y sus componentes       
+            maquina = MaquinaVirtual()
+            #maquina.construyeConstantes()
+
         else: 
             print("Syntax error")
     except EOFError:

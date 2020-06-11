@@ -2,6 +2,8 @@ import sys
 from nombreTipo import nombreTipo
 from stack import Stack
 from cuboSemantico import *
+from tablaDeFunciones import tablaFunc
+from tablaDeVariables import tablaVar
 
 #variables globales
 # avail es un contador para los cuadruplos
@@ -42,6 +44,8 @@ class Operaciones:
         global avail 
         global tvar 
         global ntvar
+
+        #operadorDeMemoria = tablaFunc.getMemoriaDeOperadores( listaOperadores.top())
         operador = operators.pop()
 
         operandoDerecho = opNombreTipo.pop()
@@ -60,6 +64,13 @@ class Operaciones:
             #si no es error agrega el cuadruplo
             quadruplo.addQ(operandoIzquierdo, operandoDerecho ,operador , result)
             
+            # tablaFunc.anadirMemoriaVarTemporales(res_type, result, functionName)
+            # temp = tablaFunc.getMemoriaVarTemp(result)
+            # qua = (operadorDeMemoria, operandoIzquierdo, operandoDerecho, temp)
+
+            # quads.append(qua)
+            # pilaNombres.push(temp)
+            # pilaTiposDatos.push(res_type)
 
             #hace push con el nombre de variabel y tipo de dato al stack
             opNombreTipo.push(result)
